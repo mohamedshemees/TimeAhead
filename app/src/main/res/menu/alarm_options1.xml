@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/set_bedtime"
+        android:title="Set bedtime and wake-up time"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/Edit"
+        android:title="Edit"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        app:showAsAction="never" />
+
+
+</menu>
