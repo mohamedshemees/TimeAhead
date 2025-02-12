@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.clock.data.model.Alarm
 
 @Database(entities = [Alarm::class], version = 1, exportSchema = false)
+@TypeConverters(AlarmConverters::class)
 abstract class ClockDataBase : RoomDatabase() {
     abstract fun alarmDao(): AlarmDao
 
@@ -25,5 +27,6 @@ abstract class ClockDataBase : RoomDatabase() {
                 instance
             }
         }
+
     }
 }

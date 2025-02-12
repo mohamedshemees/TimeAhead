@@ -2,13 +2,18 @@ package com.example.clock.ui.alarm
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ListView
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.constraintlayout.motion.widget.MotionLayout
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -29,30 +34,38 @@ class AlarmFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val alarmViewModel: AlarmViewModel by activityViewModels()
-
+    private lateinit var deleteButton: ImageButton
+    var alarmscount:Int=0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentAlarmBinding.inflate(inflater, container, false)
 
-        val textView = binding.alarmTatusTv
-        textView.text = "Hello, Alarm Fragment!"
-
-        val application = requireActivity().application
-        val repository = AlarmRepository(ClockDataBase.getDatabase(application).alarmDao())
-        val factory = AlarmViewModelFactory( repository)
-
-        // ✅ Use factory to create ViewModel
-
         val recyclerView = binding.alarmsRv
-
-        val adapter = AlarmAdapter(mutableListOf(), alarmViewModel)
+        deleteButton = binding.deleteAlarmBtn
+        val adapter = AlarmAdapter(
+            mutableListOf(),
+            alarmViewModel,
+            onAlarmLongClick = { isSelectionMode ->
+                recyclerView.elevation=if (isSelectionMode) 10f else 0f
+                recyclerView.alpha = if (isSelectionMode) 0.5f else 1f
+                recyclerView.setPadding(30)
+                deleteButton.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
+            },
+        )
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         alarmViewModel.allAlarms.observe(viewLifecycleOwner) { alarms ->
             adapter.updateAlarms(alarms)
+            alarmscount=alarms.size
+        }
+        deleteButton.setOnClickListener {
+            val selectedAlarms = adapter.getSelectedAlarms()
+            alarmViewModel.deleteAlarms(selectedAlarms)
+            adapter.clearSelection()
+            deleteButton.visibility = View.GONE
         }
 
         return binding.root
@@ -61,46 +74,27 @@ class AlarmFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val addAlarmBtn = binding.addAlarmBtn
+
         addAlarmBtn.setOnClickListener{
             val intent = Intent(requireContext(), AlarmCreationActivity::class.java)
             startActivity(intent)
-
-        }
-        binding.alarmNsv.setOnScrollChangeListener { _, _, scrollY, _, _ ->
-            val fadeAmount = 1 - (scrollY.toFloat() / 300)
-            binding.alarmTatusTv.alpha = fadeAmount.coerceIn(0f, 1f)
         }
         val menuButton = binding.menuButton
         menuButton.setOnClickListener {
-            val popupMenu = PopupMenu(requireContext(), menuButton)
-            val alarmCount = 2
-             when(alarmCount){
-                  0 -> popupMenu.menuInflater.inflate(R.menu.alarm_options_empty, popupMenu.menu)
-                  2 -> popupMenu.menuInflater.inflate(R.menu.alarm_options_morethan_1, popupMenu.menu)
-                 else -> popupMenu.menuInflater.inflate(R.menu.alarm_options1, popupMenu.menu)
-             }
+            // Create the PopupMenu
+            val popupMenu = PopupMenu(requireContext(),
+                menuButton,0,0,
+                R.style.custompopupmenu)
 
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.set_bedtime -> {
-                        Toast.makeText(requireContext(), "Option 1 clicked", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    R.id.edit -> {
-                        Toast.makeText(requireContext(), "Option 2 clicked", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    R.id.sort -> {
-                        Toast.makeText(requireContext(), "Option 3 clicked", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
-                }
+            val menuResId = when (alarmscount) {
+                0 -> R.menu.alarm_options_empty
+                2 -> R.menu.alarm_options_morethan_1
+                else -> R.menu.alarm_options1
             }
-            // Show the menu
+            popupMenu.menuInflater.inflate(menuResId, popupMenu.menu)
+
             popupMenu.show()
         }
-
 
     }
     }

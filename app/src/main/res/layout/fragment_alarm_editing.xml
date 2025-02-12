@@ -8,16 +8,6 @@
     tools:context=".ui.alarm.AlarmCreationActivity">
 
 
-    <fragment
-        android:id="@+id/alarm_creation_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <AnalogClock
         android:id="@+id/timepicker"
         android:layout_width="0dp"
@@ -46,7 +36,7 @@
             android:padding="15dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/alarm_name_et"
+                android:id="@+id/alarm_label_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -86,13 +76,15 @@
 
             <LinearLayout
                 android:id="@+id/alarmsound_ll"
-                android:layout_width="381dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:foreground="?attr/selectableItemBackground"
+                android:focusable="true"
                 app:layout_constraintBottom_toTopOf="@+id/vibration_ll"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/alarm_name_et">
+                app:layout_constraintTop_toBottomOf="@+id/alarm_label_et">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -106,6 +98,7 @@
                         android:text="ALarm sound" />
 
                     <TextView
+                        android:id="@+id/alarm_sound_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Finding Galaxy"
@@ -130,23 +123,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="?attr/selectableItemBackground"
+                android:focusable="true"
                 app:layout_constraintBottom_toTopOf="@+id/snooze_ll"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/alarmsound_ll">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ALarm sound" />
+                        android:text="@string/vibration" />
 
                     <TextView
+                        android:id="@+id/vibration_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Basic Call"
@@ -168,9 +166,11 @@
 
             <LinearLayout
                 android:id="@+id/snooze_ll"
-                android:layout_width="381dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:background="?attr/selectableItemBackground"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -180,6 +180,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+
                     android:orientation="vertical">
 
                     <TextView
@@ -188,6 +190,7 @@
                         android:text="Snooze" />
 
                     <TextView
+                        android:id="@+id/snooze_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5 minutes, 3 times"
@@ -212,38 +215,38 @@
     </com.google.android.material.card.MaterialCardView>
 
 
+
     <LinearLayout
         android:id="@+id/bottom_ll"
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
         android:orientation="horizontal"
+        android:gravity="end"
 
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/btnCancel"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:text="Cancel"
-            android:textColor="?colorPrimary" />
+            android:textColor="?colorPrimary"
+            android:layout_weight="1"
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/btnSave"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
             android:background="@android:color/transparent"
+            android:layout_weight="1"
+            android:textColor="?colorPrimary"
             android:text="Save"
-            android:textColor="?colorPrimary" />
+            android:layout_marginStart="16dp"/>
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline

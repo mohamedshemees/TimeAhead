@@ -20,6 +20,18 @@ interface AlarmDao {
     @Delete
     suspend fun deleteAlarm(alarm: Alarm)
 
-    @Query("SELECT * FROM alarm_table ORDER BY time ASC")
+    @Delete
+    suspend fun deleteAlarms(alarms: List<Alarm>)
+
+
+    @Query("SELECT * FROM alarm_table WHERE label = :label AND timeInMillis = :time AND days = :days")
+        suspend fun getAlarm(label: String, time: String, days: String): Alarm?
+
+
+    @Query("SELECT * FROM alarm_table ORDER BY timeInMillis ASC")
+
     fun getAllAlarms(): LiveData<List<Alarm>>
+
+    @Query("SELECT * FROM alarm_table ORDER BY timeInMillis ASC")
+    fun getAllAlarmsSynchronous(): List<Alarm>
 }

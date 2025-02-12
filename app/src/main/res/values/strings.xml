@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">Clock</string>
+    <string name="app_name">TimeAhead</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sort">Sort</string>
     <string name="edit">Edit</string>
     <string name="set_bedtime_and_wake_up_time">Set bedtime and wake-up time</string>
     <string name="settings">Settings</string>
+    <string name="vibration">Vibration</string>
 </resources>

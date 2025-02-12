@@ -14,13 +14,10 @@ import com.example.clock.R
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null) {
-            Log.e("AlarmReceiver", "Context is null, cannot show notification!")
             return
         }
-
         val alarmId = intent?.getIntExtra("alarmId", -1) ?: return
-        Log.d("AlarmReceiver", "Alarm Triggered! ID: $alarmId")
-
+        val extras = intent.extras
         showNotification(context, "Alarm is ringing!", "Time to wake up!")
     }
 

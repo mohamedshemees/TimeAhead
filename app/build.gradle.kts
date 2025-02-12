@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
-
+    id("kotlin-parcelize")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
 
 }
 
@@ -51,7 +52,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    implementation (libs.androidx.lifecycle.viewmodel.ktx.v262)
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation(libs.androidx.lifecycle.viewmodel.android)
     implementation(libs.androidx.legacy.support.v4)
@@ -65,10 +66,12 @@ dependencies {
     implementation (libs.androidx.viewpager2)
     implementation (libs.material.v1110)
 
+
     implementation (libs.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.lifecycle.livedata.ktx)
     implementation (libs.androidx.fragment.ktx)
 
+    
 
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)

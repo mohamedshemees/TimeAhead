@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.clock.ui.alarm.AlarmFragment
 import com.example.clock.ui.stopwatch.StopwatchFragment
 import com.example.clock.ui.timer.TimerFragment
-import com.example.clock.ui.worldclock.WorldClock
+import com.example.clock.ui.worldclock.WorldClockFragment
 
 class ViewPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
     override fun getItemCount(): Int {
@@ -16,7 +16,7 @@ class ViewPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activ
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> AlarmFragment()
-            1 -> WorldClock()
+            1 -> WorldClockFragment()
             2 -> StopwatchFragment()
             3 -> TimerFragment()
             else -> throw IllegalArgumentException("Invalid position: $position")

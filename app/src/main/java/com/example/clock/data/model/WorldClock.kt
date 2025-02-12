@@ -1,5 +1,9 @@
 package com.example.clock.data.model
 
+
 data class WorldClock(
-    val id: Int,
+
+    val timezone: String,
+    val offset: String,
+    val weather : String,
 )
