@@ -4,17 +4,17 @@ TimeAhead ⏰
 
 ## 📜 Features
 
-✔ Alarm – Set and manage multiple alarms with customizable labels.
-✔ Stopwatch – Track lap times and overall duration in real-time.
-✔ Timer – Countdown timer with precise control.
-✔ Current Time – Displays the local time in 12-hour format (AM/PM).
+**✔ Alarm** – Set and manage multiple alarms with customizable labels.
+**✔ Stopwatch** – Track lap times and overall duration in real-time.
+**✔ Timer** – Countdown timer with precise control.
+**✔ Current Time** – Displays the local time in 12-hour format (AM/PM).
 
 ## Technologies Used
 - **Kotlin**: For the app’s development
-- **MVVM Architecture**  Ensures separation of concerns and clean code.
-- **Room Database** Persists alarms locally for reliability.
-- **LiveData & Coroutines** Provides smooth and responsive UI updates.
-- **AlarmManager & notificationManager** Handles alarm scheduling 
+- **MVVM Architecture**:  Ensures separation of concerns and clean code.
+- **Room Database**: Persists alarms locally for reliability.
+- **LiveData & Coroutines**: Provides smooth and responsive UI updates.
+- **AlarmManager & notificationManager**: Handles alarm scheduling 
 
 
 ## 📸 Screenshots
