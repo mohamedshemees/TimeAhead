@@ -1,4 +1,4 @@
-TimeAhead ⏰
+**TimeAhead🕒**
 
 **TimeAhead** A modern and minimalistic Clock App featuring Alarm, Stopwatch, Timer, and Current Time, built using MVVM architecture in Android.
 
