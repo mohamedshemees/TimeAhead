@@ -11,10 +11,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.clock.databinding.FragmentSoundPickerBinding
 import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.ui.adapters.RingtoneAdapter
-import kotlinx. parcelize.Parcelize
+import com.example.clock.databinding.FragmentSoundPickerBinding
+import kotlinx.parcelize.Parcelize
 
 
 class SoundPickerFragment : Fragment() {

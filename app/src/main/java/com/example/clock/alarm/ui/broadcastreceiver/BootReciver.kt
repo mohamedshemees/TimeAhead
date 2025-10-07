@@ -1,5 +1,6 @@
 package com.example.clock.alarm.ui.broadcastreceiver
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -8,16 +9,17 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import com.example.clock.worldClock.data.ClockDataBase
-import com.example.clock.alarm.domain.Alarm
-import kotlinx.coroutines.launch
-import android.annotation.SuppressLint
 import android.util.Log
+import com.example.clock.alarm.domain.Alarm
 import com.example.clock.alarm.ui.utils.AlarmUtils
+import com.example.clock.worldClock.data.ClockDataBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class BootReceiver : BroadcastReceiver() {
 

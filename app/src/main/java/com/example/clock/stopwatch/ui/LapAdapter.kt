@@ -3,8 +3,8 @@ package com.example.clock.stopwatch.ui
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.example.clock.databinding.LapItemBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.example.clock.databinding.LapItemBinding
 
 class LapAdapter(private val laps: List<Lap>) : RecyclerView.Adapter<LapAdapter.ViewHolder>() {
 

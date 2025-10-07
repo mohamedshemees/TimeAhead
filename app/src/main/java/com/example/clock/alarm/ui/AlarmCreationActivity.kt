@@ -6,10 +6,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.clock.ClockApp
 import com.example.clock.R
-import com.example.clock.alarm.domain.Alarm
-import com.example.clock.databinding.ActivityAlarmCreationBinding
 import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.AlarmViewModelFactory
+import com.example.clock.alarm.domain.Alarm
+import com.example.clock.databinding.ActivityAlarmCreationBinding
 
 
 class AlarmCreationActivity : AppCompatActivity() {

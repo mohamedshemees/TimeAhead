@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.NumberAdapter
 import com.example.clock.databinding.FragmentTimerBinding
-import com.example.clock.timer.domain.TimerPreset
-import kotlin.concurrent.timer
 
 
 class TimerFragment : Fragment() {

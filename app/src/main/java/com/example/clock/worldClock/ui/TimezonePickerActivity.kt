@@ -6,14 +6,13 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.ClockApp
 import com.example.clock.databinding.ActivityTimezonePickerBinding
-import com.example.clock.worldClock.WorldClockViewModel
 import com.example.clock.utils.getFlattenedTimeZoneList
+import com.example.clock.worldClock.WorldClockViewModel
 
 
 class TimezonePickerActivity : AppCompatActivity() {
