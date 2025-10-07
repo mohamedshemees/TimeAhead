@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="20dp">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add preset timer"
+        android:textSize="24sp"
+        android:padding="8dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="24dp">
+        <!-- Hours -->
+        <EditText
+            android:id="@+id/hoursEditText"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="2"
+
+            android:text="00"
+            android:background="@drawable/editetext_focus"
+            android:gravity="center"
+            android:textSize="18sp" />
+
+        <!-- Colon -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:textSize="18sp"
+            android:padding="8dp" />
+
+        <!-- Minutes -->
+        <EditText
+            android:id="@+id/minutesEditText"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="2"
+
+            android:text="00"
+            android:gravity="center"
+            android:background="@drawable/editetext_focus"
+            android:textSize="18sp" />
+
+        <!-- Colon -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:textSize="18sp"
+            android:padding="8dp" />
+
+        <!-- Seconds -->
+        <EditText
+            android:id="@+id/secondsEditText"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="2"
+            android:text="00"
+            android:background="@drawable/editetext_focus"
+            android:gravity="center"
+            android:textSize="18sp" />
+        </LinearLayout>
+    <EditText
+        android:id="@+id/nameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:maxLength="2"
+        android:text=""
+        android:layout_marginHorizontal="20dp"
+
+        android:gravity="center"
+        android:textSize="18sp" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+        <Button
+            android:id="@+id/closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@android:color/transparent"
+            android:text="Cancel"
+            android:layout_weight="1"
+            android:textColor="@android:color/black" />
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@android:color/transparent"
+        android:layout_weight="1"
+        android:text="Cancel"
+        android:textColor="@android:color/black" />
+</LinearLayout>
+</LinearLayout>
+
+</androidx.cardview.widget.CardView>

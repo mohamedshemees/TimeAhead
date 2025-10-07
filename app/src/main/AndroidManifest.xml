@@ -4,8 +4,7 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".ClockApp"
@@ -19,6 +18,9 @@
         android:theme="@style/Theme.Clock"
         tools:targetApi="31">
         <activity
+            android:name=".worldClock.ui.TimezonePickerActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -27,23 +29,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.alarm.AlarmCreationActivity">
+        <activity android:name=".alarm.ui.AlarmCreationActivity"></activity>
 
-        </activity>
-
-        <receiver android:name=".ui.alarm.AlarmReceiver"
-
-            android:exported="true"
+        <receiver
+            android:name=".alarm.ui.broadcastreceiver.AlarmReceiver"
             android:enabled="true"
-             />
-<!--        <receiver android:name=".ui.alarm.BootReceiver"-->
-<!--            android:exported="true">-->
+            android:exported="true" />
+
+<!--        <receiver android:name=".alarm.ui.BootReceiver" android:exported="true">-->
 <!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
 <!--            </intent-filter>-->
 <!--        </receiver>-->
-
-
     </application>
 
 </manifest>
