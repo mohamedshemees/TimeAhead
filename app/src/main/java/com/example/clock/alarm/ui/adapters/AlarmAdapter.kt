@@ -10,13 +10,14 @@ import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.R
-import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.domain.Alarm
-import com.example.clock.alarm.ui.AlarmCreationActivity
 import com.example.clock.databinding.AlarmItemBinding
+import com.example.clock.alarm.AlarmViewModel
+import com.example.clock.alarm.ui.AlarmCreationActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
 import java.util.Calendar
 
 class AlarmAdapter (private var alarmList: MutableList<Alarm>,

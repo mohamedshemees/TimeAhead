@@ -13,16 +13,16 @@ interface TimerPresetDao {
 
 
     @Insert
-    fun insertPreset(preset: TimerPreset)
+    suspend fun insertPreset(preset: TimerPreset)
 
     @Delete
-    fun deletePreset(presetName: TimerPreset)
+    suspend fun deletePreset(presetName: TimerPreset)
 
     @Update
-    fun updatePreset(preset: TimerPreset)
+    suspend fun updatePreset(preset: TimerPreset)
 
     @Delete
-     fun deletePresets(alarms: List<TimerPreset>)
+    suspend fun deletePresets(alarms: List<TimerPreset>)
 
     @Query("Select * FROM Timer_table ")
      fun getAllPresets(): LiveData<List<TimerPreset>>

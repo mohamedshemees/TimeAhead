@@ -14,13 +14,15 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.clock.R
 import com.example.clock.alarm.domain.Alarm
+import com.example.clock.worldClock.ui.TimeZoneItem
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import java.util.TimeZone.getTimeZone
 
-class AlarmReceiver : BroadcastReceiver() {
+    class AlarmReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val alarmId = intent.getIntExtra("alarmId", -1)
             val timeInMillis = intent.getLongExtra("timeInMillis", 0L)

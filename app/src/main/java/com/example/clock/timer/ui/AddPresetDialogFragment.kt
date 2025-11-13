@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.example.clock.R
 import com.example.clock.databinding.FragmentDialogBinding
 import com.example.clock.timer.domain.TimerPreset
+import kotlinx.coroutines.launch
 
-class AddPresetDialogFragment(val onSave: (TimerPreset) -> Unit) : DialogFragment() {
+class AddPresetDialogFragment(val onSave: suspend (TimerPreset) -> Unit) : DialogFragment() {
     lateinit var binding: FragmentDialogBinding
 
     override fun onCreateView(
@@ -52,6 +54,7 @@ class AddPresetDialogFragment(val onSave: (TimerPreset) -> Unit) : DialogFragmen
             val hours = hoursEditText.text.toString().toIntOrNull() ?: 0
             val minutes = minutesEditText.text.toString().toIntOrNull() ?: 0
             val seconds = secondsEditText.text.toString().toIntOrNull() ?: 0
+            lifecycleScope.launch {
             onSave(
                 TimerPreset(
                     name = nameEditText.text.toString(),
@@ -60,7 +63,8 @@ class AddPresetDialogFragment(val onSave: (TimerPreset) -> Unit) : DialogFragmen
                     seconds = seconds,
                 )
             )
-        }
+                dismiss()
+        }}
     }
 
     override fun onStart() {
@@ -84,7 +88,7 @@ class AddPresetDialogFragment(val onSave: (TimerPreset) -> Unit) : DialogFragmen
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             if (s?.length == 2) {
-                nextEditText?.requestFocus() // Move focus to the next field
+                nextEditText?.requestFocus()
             }
         }
 

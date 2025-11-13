@@ -1,9 +1,16 @@
 package com.example.clock.timer.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.clock.ClockApp
+import com.example.clock.alarm.domain.Alarm
+import com.example.clock.alarm.ui.broadcastreceiver.AlarmReceiver
 import com.example.clock.timer.data.TimerRepository
 import com.example.clock.timer.domain.TimerPreset
 import kotlinx.coroutines.launch
@@ -13,9 +20,11 @@ class TimerViewModel(
     application: ClockApp
     ) : AndroidViewModel(application) {
 
-    lateinit var allPresets: LiveData<List<TimerPreset>>
-
-    fun insert(preset: TimerPreset) = viewModelScope.launch {
+    var allPresets: LiveData<List<TimerPreset>>
+        init {
+            allPresets = repository.getAllAlarms()
+        }
+    suspend fun insert(preset: TimerPreset) = viewModelScope.launch {
         repository.insert(preset)
     }
 

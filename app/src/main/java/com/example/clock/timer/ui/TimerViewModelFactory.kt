@@ -3,6 +3,7 @@ package com.example.clock.timer.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.clock.ClockApp
+import com.example.clock.alarm.data.AlarmRepository
 import com.example.clock.timer.data.TimerRepository
 
 class TimerViewModelFactory(private val repository: TimerRepository,

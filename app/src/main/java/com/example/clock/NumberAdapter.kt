@@ -10,16 +10,20 @@ import com.example.clock.databinding.ItemNumberBinding
 import com.example.clock.timer.domain.TimerPreset
 
 class NumberAdapter(
-    private val numbers: List<TimerPreset>,
-    val onClick:(Int)->Unit
+    val onClick: (Int) -> Unit
 ) : RecyclerView.Adapter<NumberAdapter.NumberViewHolder>() {
+    private var numbers: List<TimerPreset> = emptyList()
+    fun submitList(newNumbers: List<TimerPreset>) {
+        numbers = newNumbers
+        notifyDataSetChanged()
+    }
 
-     class NumberViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-         val binding = ItemNumberBinding.bind(itemView)
-         private val nameTextView: TextView = binding.nameTextView
-         private val numberTextView: TextView = binding.durationTextView
+    class NumberViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val binding = ItemNumberBinding.bind(itemView)
+        private val nameTextView: TextView = binding.nameTextView
+        private val numberTextView: TextView = binding.durationTextView
 
-        fun bind(numberItem: TimerPreset, onClick:(Int)->Unit) {
+        fun bind(numberItem: TimerPreset, onClick: (Int) -> Unit) {
             numberTextView.text = numberItem.hours.toString()
             numberTextView.setOnClickListener {
                 onClick(numberItem.hours)
@@ -34,7 +38,7 @@ class NumberAdapter(
     }
 
     override fun onBindViewHolder(holder: NumberViewHolder, position: Int) {
-        holder.bind(numbers[position],onClick)
+        holder.bind(numbers[position], onClick)
     }
 
     override fun getItemCount(): Int = numbers.size

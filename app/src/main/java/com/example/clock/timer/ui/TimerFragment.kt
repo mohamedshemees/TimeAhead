@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.NumberAdapter
 import com.example.clock.databinding.FragmentTimerBinding
+import com.example.clock.timer.domain.TimerPreset
+import kotlin.concurrent.timer
 
 
 class TimerFragment : Fragment() {
@@ -44,7 +46,6 @@ class TimerFragment : Fragment() {
         addPreset = binding.addPresetBtn
         addPreset.setOnClickListener {
             val dialog = AddPresetDialogFragment{
-
                 timerViewModel.insert(it)
             }
             dialog.show(parentFragmentManager, "AddPresetDialog")
@@ -55,14 +56,14 @@ class TimerFragment : Fragment() {
         }
 
 
-         recyclerView = binding.NumberRv
-        recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
-
-//         adapter = NumberAdapter(
-//             timerViewModel.allPresets.observe(viewLifecycleOwner)
-//         )
+        recyclerView = binding.NumberRv
+        adapter =NumberAdapter(){
+        }
         recyclerView.adapter = adapter
-
+        recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        timerViewModel.allPresets.observe(viewLifecycleOwner){
+            adapter.submitList(it)
+        }
         return binding.root
 
     }

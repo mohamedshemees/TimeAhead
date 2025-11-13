@@ -12,9 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.clock.R
+import com.example.clock.databinding.FragmentAlarmBinding
 import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.ui.adapters.AlarmAdapter
-import com.example.clock.databinding.FragmentAlarmBinding
 
 class AlarmFragment : Fragment() {
     private var _binding: FragmentAlarmBinding? = null
