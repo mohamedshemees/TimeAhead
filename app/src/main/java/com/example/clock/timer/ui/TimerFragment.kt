@@ -10,32 +10,36 @@ import android.widget.ImageButton
 import android.widget.NumberPicker
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.clock.ClockApp
 import com.example.clock.NumberAdapter
 import com.example.clock.databinding.FragmentTimerBinding
-import com.example.clock.timer.domain.TimerPreset
-import kotlin.concurrent.timer
 
 
 class TimerFragment : Fragment() {
     lateinit var binding: FragmentTimerBinding
     private lateinit var recyclerView: RecyclerView
     lateinit var adapter: NumberAdapter
-    lateinit var timeHoures:NumberPicker
-    lateinit var timeMinutes:NumberPicker
-    lateinit var timeSeconds:NumberPicker
-    lateinit var addPreset:ImageButton
-    lateinit var deletePreset:ImageButton
+    lateinit var timeHoures: NumberPicker
+    lateinit var timeMinutes: NumberPicker
+    lateinit var timeSeconds: NumberPicker
+    lateinit var addPreset: ImageButton
+    lateinit var deletePreset: ImageButton
 
-    private val timerViewModel: TimerViewModel by activityViewModels<TimerViewModel>()
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val timerViewModel: TimerViewModel by viewModels {
+            val app = requireActivity().application as ClockApp
+            TimerViewModelFactory(
+                app.timerRepository, app
+            )
+        }
         binding = FragmentTimerBinding.inflate(layoutInflater)
 
         timeHoures = binding.timerHoures
@@ -45,7 +49,7 @@ class TimerFragment : Fragment() {
         bindViews()
         addPreset = binding.addPresetBtn
         addPreset.setOnClickListener {
-            val dialog = AddPresetDialogFragment{
+            val dialog = AddPresetDialogFragment {
                 timerViewModel.insert(it)
             }
             dialog.show(parentFragmentManager, "AddPresetDialog")
@@ -57,11 +61,12 @@ class TimerFragment : Fragment() {
 
 
         recyclerView = binding.NumberRv
-        adapter =NumberAdapter(){
+        adapter = NumberAdapter() {
         }
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
-        timerViewModel.allPresets.observe(viewLifecycleOwner){
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        timerViewModel.allPresets.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
         return binding.root
@@ -69,9 +74,8 @@ class TimerFragment : Fragment() {
     }
 
 
-
     private fun bindViews() {
-        listOf(timeHoures,timeMinutes, timeSeconds).forEach { picker ->
+        listOf(timeHoures, timeMinutes, timeSeconds).forEach { picker ->
             picker.setFormatter { String.format("%02d", it) }
             picker.wrapSelectorWheel = true
         }

@@ -9,34 +9,41 @@ import android.widget.ImageButton
 import android.widget.PopupMenu
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.clock.ClockApp
 import com.example.clock.R
-import com.example.clock.databinding.FragmentAlarmBinding
 import com.example.clock.alarm.AlarmViewModel
+import com.example.clock.alarm.AlarmViewModelFactory
 import com.example.clock.alarm.ui.adapters.AlarmAdapter
+import com.example.clock.databinding.FragmentAlarmBinding
 
 class AlarmFragment : Fragment() {
     private var _binding: FragmentAlarmBinding? = null
     private val binding get() = _binding!!
-
-    private val alarmViewModel: AlarmViewModel by activityViewModels()
-
     private lateinit var deleteButton: ImageButton
-    var alarmscount:Int=0
+    var alarmscount: Int = 0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        val alarmViewModel: AlarmViewModel by viewModels {
+            val app = requireActivity().application as ClockApp
+            AlarmViewModelFactory(
+                app.alarmRepository, app
+            )
+        }
+        alarmViewModel.getAllAlarms()
+
         _binding = FragmentAlarmBinding.inflate(inflater, container, false)
 
         val recyclerView = binding.alarmsRv
         deleteButton = binding.deleteAlarmBtn
         val adapter = AlarmAdapter(
             mutableListOf(),
-            alarmViewModel,
+            onAlarmToggled = { alarm -> alarmViewModel.update(alarm) },
             onAlarmLongClick = { isSelectionMode ->
-                recyclerView.elevation=if (isSelectionMode) 10f else 0f
+                recyclerView.elevation = if (isSelectionMode) 10f else 0f
                 recyclerView.alpha = if (isSelectionMode) 0.5f else 1f
                 recyclerView.setPadding(30)
                 deleteButton.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
@@ -47,7 +54,7 @@ class AlarmFragment : Fragment() {
 
         alarmViewModel.allAlarms.observe(viewLifecycleOwner) { alarms ->
             adapter.updateAlarms(alarms)
-            alarmscount=alarms.size
+            alarmscount = alarms.size
         }
         deleteButton.setOnClickListener {
             val selectedAlarms = adapter.getSelectedAlarms()
@@ -63,16 +70,17 @@ class AlarmFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val addAlarmBtn = binding.addAlarmBtn
 
-        addAlarmBtn.setOnClickListener{
+        addAlarmBtn.setOnClickListener {
             val intent = Intent(requireContext(), AlarmCreationActivity::class.java)
             startActivity(intent)
         }
         val menuButton = binding.menuButton
         menuButton.setOnClickListener {
-            // Create the PopupMenu
-            val popupMenu = PopupMenu(requireContext(),
-                menuButton,0,0,
-                R.style.custompopupmenu)
+            val popupMenu = PopupMenu(
+                requireContext(),
+                menuButton, 0, 0,
+                R.style.custompopupmenu
+            )
 
             val menuResId = when (alarmscount) {
                 0 -> R.menu.alarm_options_empty
@@ -83,8 +91,5 @@ class AlarmFragment : Fragment() {
 
             popupMenu.show()
         }
-
     }
-    }
-
-
+}

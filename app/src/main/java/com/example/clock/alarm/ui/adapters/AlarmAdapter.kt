@@ -12,22 +12,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.R
 import com.example.clock.alarm.domain.Alarm
 import com.example.clock.databinding.AlarmItemBinding
-import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.ui.AlarmCreationActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 import java.util.Calendar
 
-class AlarmAdapter (private var alarmList: MutableList<Alarm>,
-                    private val viewModel: AlarmViewModel,
-                    private val onAlarmLongClick: (Boolean) -> Unit
-
-):RecyclerView.Adapter<AlarmAdapter.ViewHolder>() {
+class AlarmAdapter(
+    private var alarmList: MutableList<Alarm>,
+    private val onAlarmToggled: (Alarm) -> Unit,
+    private val onAlarmLongClick: (Boolean) -> Unit
+) : RecyclerView.Adapter<AlarmAdapter.ViewHolder>() {
     private val selectedAlarms = mutableSetOf<Alarm>()
     private var isSelectionMode = false
-    lateinit var context :Context
+    lateinit var context: Context
 
     class ViewHolder(itemView: AlarmItemBinding) : RecyclerView.ViewHolder(itemView.root) {
         val timeTextView: TextView = itemView.timeTv
@@ -39,7 +34,7 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = AlarmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        context=parent.context
+        context = parent.context
         return ViewHolder(binding)
     }
 
@@ -47,18 +42,12 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
         val alarm = alarmList[position]
 
         holder.switch.setOnCheckedChangeListener(null)
+        holder.switch.isChecked = alarm.Enabled
         holder.switch.setOnCheckedChangeListener { _, isChecked ->
             alarm.Enabled = isChecked
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.update(alarm) // Save the change in Room DB
-                if (isChecked) {
-                   // viewModel.update(alarm)
-                } else {
-                   // viewModel.update(alarm)
-                    viewModel.cancelAlarm(context,alarm)
-                }
-            }
+            onAlarmToggled(alarm)
         }
+
         holder.timeTextView.text = convertMillisToTimeWithCalendar(alarm.timeInMillis)
         holder.labelTextView.text = alarm.label
         holder.dateTextView.text = alarm.days
@@ -66,18 +55,16 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
 
         if (holder.labelTextView.text.isEmpty()) {
             holder.labelTextView.visibility = View.GONE
-        }
-        else{
+        } else {
             holder.labelTextView.visibility = View.VISIBLE
         }
-        if(alarm.Enabled){
+
+        if (alarm.Enabled) {
             holder.timeTextView.setTextColor(Color.BLACK)
             holder.dateTextView.setTextColor(Color.BLACK)
             holder.amapm.setTextColor(Color.BLACK)
             holder.labelTextView.setTextColor(Color.BLACK)
-            holder.switch.isChecked=true
-        }
-        else{
+        } else {
             holder.timeTextView.setTextColor(Color.GRAY)
             holder.dateTextView.setTextColor(Color.GRAY)
             holder.labelTextView.setTextColor(Color.GRAY)
@@ -94,14 +81,12 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
             }
         }
 
-
         val backgroundRes = if (selectedAlarms.contains(alarm)) {
             R.drawable.rounded_selected_background
         } else {
             R.drawable.rounded_background
         }
         holder.itemView.setBackgroundResource(backgroundRes)
-
 
         holder.itemView.setOnLongClickListener {
             if (!isSelectionMode) {
@@ -126,6 +111,7 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
         }
         notifyDataSetChanged()
     }
+
     fun getSelectedAlarms(): List<Alarm> {
         return selectedAlarms.toList()
     }
@@ -135,6 +121,7 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
         isSelectionMode = false
         notifyDataSetChanged()
     }
+
     private fun convertMillisToTimeWithCalendar(millis: Long): String {
         val calendar = Calendar.getInstance().apply { timeInMillis = millis }
         val hour = calendar.get(Calendar.HOUR) // 12-hour format (0-11)
@@ -152,9 +139,3 @@ class AlarmAdapter (private var alarmList: MutableList<Alarm>,
         notifyDataSetChanged() // Refresh RecyclerView
     }
 }
-
-
-
-
-
-

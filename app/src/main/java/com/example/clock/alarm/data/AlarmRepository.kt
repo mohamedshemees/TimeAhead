@@ -36,7 +36,7 @@ class AlarmRepository(
         fun getSystemRingtones(context: Context) {
             val ringtoneManager = RingtoneManager(context)
             val ringtones = mutableListOf<Ringtone>()
-            ringtoneManager.setType(RingtoneManager.TYPE_ALARM) // Use TYPE_RINGTONE for ringtones, TYPE_NOTIFICATION for notifications
+            ringtoneManager.setType(RingtoneManager.TYPE_ALARM)
             val cursor = ringtoneManager.cursor
             while (cursor.moveToNext()) {
                 val ringtoneUri = ringtoneManager.getRingtoneUri(cursor.position)
@@ -54,8 +54,8 @@ class AlarmRepository(
 
     fun getDefaultTimeMillis(): Long {
         val calendar = Calendar.getInstance().apply {
-            timeZone = TimeZone.getDefault() // Ensure it uses the local time zone
-            set(Calendar.HOUR_OF_DAY, 6) // Set hour to 6 AM
+            timeZone = TimeZone.getDefault()
+            set(Calendar.HOUR_OF_DAY, 6)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)

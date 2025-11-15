@@ -2,12 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="10dp"
     android:foreground="?attr/selectableItemBackground"
     android:focusable="true"
     android:clickable="true"
-
+    app:cardBackgroundColor="@color/surface"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,6 +23,7 @@
             android:layout_marginTop="10dp"
             android:text="6:00"
             android:textSize="20sp"
+            android:textColor="@color/on_surface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title_tv" />
@@ -35,6 +35,7 @@
             android:layout_marginLeft="5dp"
             android:text="am"
             android:textSize="12dp"
+            android:textColor="@color/on_surface"
             app:layout_constraintBottom_toBottomOf="@+id/time_tv"
             app:layout_constraintStart_toEndOf="@+id/time_tv" />
 
@@ -43,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="wed,5 Feb"
+            android:textColor="@color/on_surface"
             app:layout_constraintBottom_toBottomOf="@id/activ_alarm_swtch"
             app:layout_constraintEnd_toStartOf="@id/activ_alarm_swtch"
             app:layout_constraintTop_toTopOf="@id/activ_alarm_swtch" />
@@ -51,7 +53,6 @@
             android:id="@+id/activ_alarm_swtch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:theme="@style/Theme.Material3.Dark.DialogWhenLarge"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -62,6 +63,7 @@
             android:layout_height="wrap_content"
             android:text="TextView"
             android:textSize="18sp"
+            android:textColor="@color/on_surface"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

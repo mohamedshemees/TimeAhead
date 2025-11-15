@@ -21,53 +21,18 @@ class AlarmViewModel(
 
     lateinit var allAlarms: LiveData<List<Alarm>>
 
-    fun insert(alarm: Alarm) = viewModelScope.launch {
-        repository.insert(alarm)
-    }
-
-    fun update(alarm: Alarm) = viewModelScope.launch {
-        repository.update(alarm)
-    }
-
-    fun delete(alarm: Alarm) = viewModelScope.launch {
-        repository.delete(alarm)
-    }
-
     fun getAllAlarms() {
         allAlarms = repository.getAllAlarms()
     }
-
+    fun update(alarm: Alarm) = viewModelScope.launch {
+        repository.update(alarm)
+    }
     fun deleteAlarms(alarms: List<Alarm>) = viewModelScope.launch {
-        for (alarm in alarms) {
-            //cancelAlarm(application, alarm)
-        }
         repository.deleteAlarms(alarms)
     }
-
-    fun insertOrUpdateAlarm(updatedAlarm: Alarm, oldAlarm: Alarm)=viewModelScope.launch  {
-        val existingAlarm = oldAlarm
-
-        if (existingAlarm != null) {
-            // If the primary key has changed, delete the old entry first
-            if (existingAlarm.label != updatedAlarm.label ||
-                existingAlarm.timeInMillis != updatedAlarm.timeInMillis ||
-                existingAlarm.days != updatedAlarm.days) {
-
-                repository.delete(existingAlarm) // Remove old alarm with old primary key
-            }
-        }
-
-        // Insert the updated alarm (whether it's a new one or a replacement)
-        repository.insert(updatedAlarm)
-    }
-
-
-
-
-
     fun cancelAlarm(context: Context, alarm: Alarm) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmId = alarm.alarmId // Use stored ID
+        val alarmId = alarm.alarmId
         Log.d("wow", "Cancelling alarm with ID: $alarmId")
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {

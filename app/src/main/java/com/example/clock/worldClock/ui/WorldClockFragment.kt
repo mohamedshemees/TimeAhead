@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -18,11 +19,16 @@ import java.util.TimeZone
 class WorldClockFragment : Fragment() {
     lateinit var binding: FragmentWorldclockBinding
 
-    private val worldClockViewModel: WorldClockViewModel by activityViewModels<WorldClockViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val worldClockViewModel: WorldClockViewModel by viewModels {
+            val app = requireActivity().application as ClockApp
+            WorldClockViewModelFactory(
+                app.clockRepository, app
+            )
+        }
         binding = FragmentWorldclockBinding.inflate(inflater, container, false)
 
        val recyclerView = binding.timzonesRv

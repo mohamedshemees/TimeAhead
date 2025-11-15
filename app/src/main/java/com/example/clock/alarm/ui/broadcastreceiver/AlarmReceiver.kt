@@ -9,8 +9,11 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.clock.R
 import com.example.clock.alarm.domain.Alarm
@@ -22,94 +25,135 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.TimeZone.getTimeZone
 
-    class AlarmReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val alarmId = intent.getIntExtra("alarmId", -1)
-            val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
-            val days = intent.getStringExtra("days") ?: ""
-            val label = intent.getStringExtra("label") ?: ""
 
-            Log.d("wow", "Alarm fired: ID=$alarmId, Time=$timeInMillis, Days=$days, Label=$label")
-            showNotification(context, label, "Alarm triggered at ${SimpleDateFormat("HH:mm").format(Date(timeInMillis))}")
+class AlarmReceiver : BroadcastReceiver() {
 
-            val alarm = Alarm(alarmId = alarmId, timeInMillis = timeInMillis, days = days, label = label)
-            if (days.isNotEmpty() || alarm.getRepeatDays().isEmpty()) {
-                scheduleNextAlarm(context, alarmId, alarm)
-            } else {
-                Log.d("wow", "One-time alarm, no rescheduling.")
-            }
+    override fun onReceive(context: Context, intent: Intent) {
+        val alarmId = intent.getIntExtra("alarmId", -1)
+        val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
+        val days = intent.getStringExtra("days") ?: ""
+        val label = intent.getStringExtra("label") ?: ""
+        val soundOn = intent.getBooleanExtra("soundOn", true)
+        val soundUri = intent.getStringExtra("soundUri")
+        Log.d("ALARM", "Alarm fired (id=$alarmId, label=$label, days=$days)")
+        Log.d("ALARM", "soundUri (id=$soundUri")
+
+        showNotification(
+            context,
+            title = label.ifBlank { "Alarm" },
+            message = "Alarm triggered at ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())}",
+            soundUri = soundUri
+        )
+
+        val alarm = Alarm(
+            alarmId = alarmId,
+            timeInMillis = timeInMillis,
+            days = days,
+            label = label,
+            sound = Alarm.AlarmSound(soundOn = soundOn, soundUri = soundUri ?: "")
+        )
+        Log.d("ALARM", "${alarm.getRepeatDays()}")
+
+
+        if (alarm.getRepeatDays().isNotEmpty()) {
+            scheduleNextAlarm(context, alarmId, alarm)
+        } else {
+            Log.d("ALARM", "One-time alarm. Not rescheduling.")
+        }
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private fun scheduleNextAlarm(context: Context, alarmId: Int, alarm: Alarm) {
+        val alarmManager = context.getSystemService(AlarmManager::class.java)
+        val repeatDays = alarm.getRepeatDays()
+        val now = Calendar.getInstance()
+        val next = Calendar.getInstance()
+
+        next.timeInMillis = alarm.timeInMillis
+        next.set(Calendar.YEAR, now.get(Calendar.YEAR))
+        next.set(Calendar.MONTH, now.get(Calendar.MONTH))
+        next.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH))
+
+        val currentDayIndex = now.get(Calendar.DAY_OF_WEEK) - 1
+
+        val sortedDays = repeatDays.sorted()
+
+        val nextDay = sortedDays.firstOrNull { it > currentDayIndex } ?: sortedDays.first()
+
+        var daysToAdd = nextDay - currentDayIndex
+        if (daysToAdd <= 0) daysToAdd += 7
+
+        next.add(Calendar.DAY_OF_MONTH, daysToAdd)
+
+        val nextTimeInMillis = next.timeInMillis
+
+        Log.d(
+            "ALARM",
+            "Rescheduling alarm $alarmId to " +
+                    SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(nextTimeInMillis))
+        )
+
+        val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("alarmId", alarmId)
+            putExtra("timeInMillis", nextTimeInMillis)
+            putExtra("days", alarm.days)
+            putExtra("label", alarm.label)
+            putExtra("soundOn", alarm.sound.soundOn)
+            putExtra("soundUri", alarm.sound.soundUri)
         }
 
-        @SuppressLint("ScheduleExactAlarm")
-        private fun scheduleNextAlarm(context: Context, alarmId: Int, alarm: Alarm) {
-            val alarmManager = context.getSystemService(AlarmManager::class.java)
-            val repeatDays = alarm.getRepeatDays()
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            alarmId,
+            alarmIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-            val calendar = Calendar.getInstance(getTimeZone("UTC")).apply {
-                timeInMillis = alarm.timeInMillis
-            }
-            val currentTime = Calendar.getInstance(getTimeZone("UTC")).timeInMillis
-
-            val oneDayInMillis = 24 * 60 * 60 * 1000L
-            var nextTimeInMillis = alarm.timeInMillis
-
-            if (repeatDays.isEmpty()) {
-                nextTimeInMillis += oneDayInMillis
-            } else {
-                val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1
-                val nextDayIndex = repeatDays.indexOfFirst { it > currentDayOfWeek }
-                    .takeIf { it >= 0 } ?: repeatDays.first()
-                val daysToAdd = (nextDayIndex - currentDayOfWeek + 7) % 7
-                    .let { if (it == 0) 7 else it }
-                nextTimeInMillis += daysToAdd * oneDayInMillis
-            }
-
-            if (nextTimeInMillis <= currentTime) {
-                nextTimeInMillis += oneDayInMillis * (if (repeatDays.isEmpty()) 1 else 7)
-            }
-
-            val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
-                putExtra("alarmId", alarmId)
-                putExtra("timeInMillis", nextTimeInMillis)
-                putExtra("days", alarm.days)
-                putExtra("label", alarm.label)
-            }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                alarmId,
-                alarmIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            val utcFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss 'UTC'", Locale.getDefault()).apply {
-                timeZone = getTimeZone("UTC")
-            }
-            Log.d("wow", "Rescheduling alarm $alarmId at: ${utcFormat.format(Date(nextTimeInMillis))}")
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextTimeInMillis, pendingIntent)
-        }
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            nextTimeInMillis,
+            pendingIntent
+        )
+    }
 
     companion object {
-        fun showNotification(context: Context, title: String, message: String) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        fun showNotification(context: Context, title: String, message: String, soundUri: String? = null) {
+            val nm = context.getSystemService(NotificationManager::class.java)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    "alarm_channel",
-                    "Alarms",
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-                notificationManager.createNotificationChannel(channel)
-            }
+            val channel = NotificationChannel(
+                "alarm_channel",
+                "Alarms",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            nm.createNotificationChannel(channel)
 
-            val builder = NotificationCompat.Builder(context, "alarm_channel")
+            val customView = RemoteViews(context.packageName, R.layout.item_alarm_notification)
+            customView.setTextViewText(R.id.notification_title, title)
+            customView.setTextViewText(R.id.notification_message, message)
+
+
+            val notif = NotificationCompat.Builder(context, "alarm_channel")
                 .setSmallIcon(R.drawable.ic_alarm)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCustomContentView(customView)
+                .setCustomBigContentView(customView)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
+                .setSound(null)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .build()
 
-            notificationManager.notify(title.hashCode(), builder.build()) // Unique ID per title
+            nm.notify(title.hashCode(), notif)
+
+            soundUri?.let {
+                try {
+                    val ringtone = RingtoneManager.getRingtone(context, Uri.parse(it))
+
+                    ringtone.play()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
+
     }
 }

@@ -2,6 +2,7 @@ package com.example.clock.alarm.domain
 
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.room.Entity
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -10,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "alarm_table", primaryKeys = ["timeInMillis", "label", "days"])
 data class Alarm(
-    var alarmId: Int = 0,
+    var alarmId: Int = -1,
     var timeInMillis: Long = 0,
     var label: String = "",
     var days: String = "Monday",
@@ -53,11 +54,15 @@ data class Alarm(
 
     fun getRepeatDays(): List<Int> {
         if (days.isEmpty()) return emptyList()
+
         val dayNames = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-        if(days.contains("every")) {
-            days.removeRange(0..4)
+        val cleanDays = days.removePrefix("every ").trim()
+
+        val result = cleanDays.split(",").mapNotNull { day ->
+            val index = day.trim().let { dayNames.indexOf(it) }
+            index.takeIf { it >= 0 }
         }
-        return days.split(", ").mapNotNull { day -> dayNames.indexOf(day.trim()).takeIf { it >= 0 } }
+        return result
     }
 }
 
