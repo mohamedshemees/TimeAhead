@@ -18,7 +18,11 @@ class AlarmViewModel(
     var repository: AlarmRepository,
     application: ClockApp
     ) : AndroidViewModel(application) {
-
+init {
+    viewModelScope.launch {
+        repository.getSystemRingtones(application)
+    }
+}
     lateinit var allAlarms: LiveData<List<Alarm>>
 
     fun getAllAlarms() {

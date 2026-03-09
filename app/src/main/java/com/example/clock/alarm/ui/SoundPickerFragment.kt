@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.clock.databinding.FragmentSoundPickerBinding
 import com.example.clock.alarm.AlarmViewModel
 import com.example.clock.alarm.ui.adapters.RingtoneAdapter
-import kotlinx. parcelize.Parcelize
-
+import kotlinx.parcelize.Parcelize
 
 class SoundPickerFragment : Fragment() {
     private val alarmViewModel: AlarmViewModel by activityViewModels()
@@ -29,18 +28,17 @@ class SoundPickerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentSoundPickerBinding.inflate(layoutInflater)
+    ): View {
+        _binding = FragmentSoundPickerBinding.inflate(inflater, container, false)
 
         binding.ringtonesRv.layoutManager = LinearLayoutManager(requireContext())
 
         // Set up adapter
-        var pickedRingtone: Ringtone =alarmViewModel.repository.allRingtones[0]
+        var pickedRingtone: Ringtone = alarmViewModel.repository.allRingtones[0]
         val adapter = RingtoneAdapter(alarmViewModel.repository.allRingtones) { ringtone ->
             playRingtone(requireContext(), ringtone.uri)
             selectedRingtoneUri = ringtone.uri
-            pickedRingtone=ringtone
-
+            pickedRingtone = ringtone
         }
         binding.ringtonesRv.adapter = adapter
 
@@ -49,17 +47,14 @@ class SoundPickerFragment : Fragment() {
                 putParcelable("selected_ringtone", pickedRingtone)
             }
             parentFragmentManager.setFragmentResult("ringtone_request", result)
-
             parentFragmentManager.popBackStack()
         }
 
         return binding.root
     }
 
-
-
     fun playRingtone(context: Context, uri: Uri) {
-        stopRingtone() // Stop any currently playing ringtone
+        stopRingtone()
         currentRingtone = RingtoneManager.getRingtone(context, uri)
         currentRingtone?.play()
     }
@@ -73,8 +68,12 @@ class SoundPickerFragment : Fragment() {
         super.onStop()
         stopRingtone() // Stop playback when the fragment is no longer visible
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     @Parcelize
-    data class Ringtone(val title: String, val uri: Uri): Parcelable
-
-
+    data class Ringtone(val title: String, val uri: Uri) : Parcelable
 }

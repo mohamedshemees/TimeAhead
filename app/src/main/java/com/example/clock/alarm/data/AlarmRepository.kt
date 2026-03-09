@@ -33,7 +33,7 @@ class AlarmRepository(
         return alarmDao.getAllAlarms()
     }
 
-        fun getSystemRingtones(context: Context) {
+        suspend fun getSystemRingtones(context: Context) {
             val ringtoneManager = RingtoneManager(context)
             val ringtones = mutableListOf<Ringtone>()
             ringtoneManager.setType(RingtoneManager.TYPE_ALARM)
@@ -51,7 +51,6 @@ class AlarmRepository(
             return alarmDao.getAlarm(label, time, days)
         }
 
-
     fun getDefaultTimeMillis(): Long {
         val calendar = Calendar.getInstance().apply {
             timeZone = TimeZone.getDefault()
@@ -62,7 +61,5 @@ class AlarmRepository(
         }
         return calendar.timeInMillis
     }
-
-
 }
 

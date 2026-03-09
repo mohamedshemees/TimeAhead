@@ -9,58 +9,98 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.clock.R
 import com.example.clock.alarm.domain.Alarm
-import com.example.clock.worldClock.ui.TimeZoneItem
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
-import java.util.TimeZone.getTimeZone
 
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getIntExtra("alarmId", -1)
-        val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
-        val days = intent.getStringExtra("days") ?: ""
-        val label = intent.getStringExtra("label") ?: ""
-        val soundOn = intent.getBooleanExtra("soundOn", true)
-        val soundUri = intent.getStringExtra("soundUri")
-        Log.d("ALARM", "Alarm fired (id=$alarmId, label=$label, days=$days)")
-        Log.d("ALARM", "soundUri (id=$soundUri")
 
-        showNotification(
-            context,
-            title = label.ifBlank { "Alarm" },
-            message = "Alarm triggered at ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())}",
-            soundUri = soundUri
-        )
+        when (intent.action) {
+            ACTION_DISMISS -> {
+                stopRingtone()
+                val nm = context.getSystemService(NotificationManager::class.java)
+                nm.cancel(alarmId)
+            }
+            ACTION_SNOOZE -> {
+                stopRingtone()
+                val nm = context.getSystemService(NotificationManager::class.java)
+                nm.cancel(alarmId)
+                scheduleSnooze(context, intent)
+            }
+            else -> {
+                val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
+                val days = intent.getStringExtra("days") ?: ""
+                val label = intent.getStringExtra("label") ?: ""
+                val soundOn = intent.getBooleanExtra("soundOn", true)
+                val soundUri = intent.getStringExtra("soundUri")
+                Log.d("ALARM", "Alarm fired (id=$alarmId, label=$label, days=$days)")
+                Log.d("ALARM", "soundUri (id=$soundUri")
 
-        val alarm = Alarm(
-            alarmId = alarmId,
-            timeInMillis = timeInMillis,
-            days = days,
-            label = label,
-            sound = Alarm.AlarmSound(soundOn = soundOn, soundUri = soundUri ?: "")
-        )
-        Log.d("ALARM", "${alarm.getRepeatDays()}")
+                showNotification(
+                    context,
+                    alarmId = alarmId,
+                    title = label.ifBlank { "Alarm" },
+                    message = "Alarm triggered at ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())}",
+                    soundUri = soundUri,
+                    intent = intent
+                )
 
+                val alarm = Alarm(
+                    alarmId = alarmId,
+                    timeInMillis = timeInMillis,
+                    days = days,
+                    label = label,
+                    sound = Alarm.AlarmSound(soundOn = soundOn, soundUri = soundUri ?: "")
+                )
+                Log.d("ALARM", "${alarm.getRepeatDays()}")
 
-        if (alarm.getRepeatDays().isNotEmpty()) {
-            scheduleNextAlarm(context, alarmId, alarm)
-        } else {
-            Log.d("ALARM", "One-time alarm. Not rescheduling.")
+                if (alarm.getRepeatDays().isNotEmpty()) {
+                    scheduleNextAlarm(context, alarmId, alarm)
+                } else {
+                    Log.d("ALARM", "One-time alarm. Not rescheduling.")
+                }
+            }
         }
     }
+
+    @SuppressLint("ScheduleExactAlarm")
+    private fun scheduleSnooze(context: Context, originalIntent: Intent) {
+        val alarmManager = context.getSystemService(AlarmManager::class.java)
+        val snoozeTime = System.currentTimeMillis() + 10 * 60 * 1000 // 10 minutes
+
+        val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
+
+            putExtras(originalIntent)
+            action = null
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            originalIntent.getIntExtra("alarmId", -1),
+            alarmIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            snoozeTime,
+            pendingIntent
+        )
+    }
+
 
     @SuppressLint("ScheduleExactAlarm")
     private fun scheduleNextAlarm(context: Context, alarmId: Int, alarm: Alarm) {
@@ -117,7 +157,15 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        fun showNotification(context: Context, title: String, message: String, soundUri: String? = null) {
+        private const val ACTION_SNOOZE = "com.example.clock.SNOOZE"
+        private const val ACTION_DISMISS = "com.example.clock.DISMISS"
+        private var ringtone: Ringtone? = null
+
+        private fun stopRingtone() {
+            ringtone?.stop()
+        }
+
+        fun showNotification(context: Context, alarmId: Int, title: String, message: String, soundUri: String? = null, intent: Intent) {
             val nm = context.getSystemService(NotificationManager::class.java)
 
             val channel = NotificationChannel(
@@ -127,10 +175,25 @@ class AlarmReceiver : BroadcastReceiver() {
             )
             nm.createNotificationChannel(channel)
 
+            // Snooze Action
+            val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+                action = ACTION_SNOOZE
+                putExtras(intent) // Copy original extras
+            }
+            val snoozePendingIntent = PendingIntent.getBroadcast(context, alarmId, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+            // Dismiss Action
+            val dismissIntent = Intent(context, AlarmReceiver::class.java).apply {
+                action = ACTION_DISMISS
+                putExtra("alarmId", alarmId)
+            }
+            val dismissPendingIntent = PendingIntent.getBroadcast(context, alarmId + 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
             val customView = RemoteViews(context.packageName, R.layout.item_alarm_notification)
             customView.setTextViewText(R.id.notification_title, title)
             customView.setTextViewText(R.id.notification_message, message)
-
+            customView.setOnClickPendingIntent(R.id.delete_alarm_btn, snoozePendingIntent)
+            customView.setOnClickPendingIntent(R.id.delete_alarm_btn, dismissPendingIntent)
 
             val notif = NotificationCompat.Builder(context, "alarm_channel")
                 .setSmallIcon(R.drawable.ic_alarm)
@@ -142,13 +205,13 @@ class AlarmReceiver : BroadcastReceiver() {
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .build()
 
-            nm.notify(title.hashCode(), notif)
+            nm.notify(alarmId, notif)
 
             soundUri?.let {
                 try {
-                    val ringtone = RingtoneManager.getRingtone(context, Uri.parse(it))
-
-                    ringtone.play()
+                    stopRingtone()
+                    ringtone = RingtoneManager.getRingtone(context, Uri.parse(it))
+                    ringtone?.play()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

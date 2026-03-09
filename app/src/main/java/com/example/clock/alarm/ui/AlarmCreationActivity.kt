@@ -30,13 +30,11 @@ class AlarmCreationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAlarmCreationBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        alarmViewModel
         interactionListener = viewModel
 
         if (savedInstanceState == null) {
             val alarm = intent?.getParcelableExtra<Alarm>("alarm") ?: Alarm()
             interactionListener.initAlarm(alarm)
-
             supportFragmentManager.beginTransaction()
                 .replace(R.id.alarm_creation_container, AlarmEditingFragment())
                 .commit()

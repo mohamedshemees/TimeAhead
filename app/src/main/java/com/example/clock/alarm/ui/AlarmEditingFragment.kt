@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -44,10 +45,18 @@ class AlarmEditingFragment : Fragment() {
     private fun setupViews() {
         val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val selectedDaysContainer = binding.daysLl
+        selectedDaysContainer.removeAllViews() // Prevent duplication
         days.forEachIndexed { index, item ->
             val textView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.item_circle, selectedDaysContainer, false) as TextView
             textView.text = item[0].toString()
+            // Set layout weight to 1
+            val params = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f
+            )
+            textView.layoutParams = params
             selectedDaysContainer.addView(textView)
             textView.setOnClickListener {
                 interactionListener.toggleDay(index)
@@ -86,6 +95,20 @@ class AlarmEditingFragment : Fragment() {
         }
     }
 
+    private fun getSelectedIndicesFromText(selectedDaysText: String): List<Int> {
+        val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        if (selectedDaysText.startsWith("every ")) {
+            val daysString = selectedDaysText.substringAfter("every ")
+            return daysString.split(", ").mapNotNull { dayName ->
+                daysOfWeek.indexOf(dayName).takeIf { it != -1 }
+            }
+        }
+        if (selectedDaysText == "Every day") {
+            return daysOfWeek.indices.toList()
+        }
+        return emptyList()
+    }
+
     private fun observeViewModel() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             state ?: return@observe
@@ -99,7 +122,8 @@ class AlarmEditingFragment : Fragment() {
             binding.alarmVibrationSwtch.isChecked = state.alarm.vibrate.vibrationOn
             binding.alarmSnoozeSwtch.isChecked = state.alarm.snooze.snoozeOn
 
-            updateDayButtons(state.alarm.getRepeatDays())
+            val selectedIndices = getSelectedIndicesFromText(state.selectedDaysText)
+            updateDayButtons(selectedIndices)
 
             if (state.finishActivity) {
                 requireActivity().finish()
