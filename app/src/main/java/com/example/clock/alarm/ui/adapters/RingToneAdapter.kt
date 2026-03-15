@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.R
 import com.example.clock.alarm.Ringtone
-import com.example.clock.alarm.ui.SoundPickerFragment
 
 class RingtoneAdapter(
     private val ringtones: List<Ringtone>,

@@ -12,7 +12,7 @@ import com.example.clock.timer.data.TimerPresetDao
 import com.example.clock.timer.domain.TimerPreset
 import com.example.clock.worldClock.ui.TimeZoneItem
 
-@Database(entities = [AlarmEntity::class, TimeZoneItem.TimeZone::class, TimerPreset::class], version = 1, exportSchema = false)
+@Database(entities = [AlarmEntity::class, TimeZoneItem.TimeZone::class, TimerPreset::class], version = 2, exportSchema = false)
 @TypeConverters(AlarmConverters::class)
 abstract class ClockDataBase : RoomDatabase() {
     abstract fun alarmDao(): AlarmDao
@@ -29,7 +29,9 @@ abstract class ClockDataBase : RoomDatabase() {
                     context.applicationContext,
                     ClockDataBase::class.java,
                     "Clock_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

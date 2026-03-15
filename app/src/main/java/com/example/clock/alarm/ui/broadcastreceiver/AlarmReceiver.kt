@@ -15,57 +15,75 @@ import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.example.clock.ClockApp
 import com.example.clock.R
+import com.example.clock.alarm.data.AlarmRepository
 import com.example.clock.alarm.domain.Alarm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 
-class AlarmReceiver : BroadcastReceiver() {
+class AlarmReceiver(
+    private val alarmRepository: AlarmRepository = ClockApp.instance.alarmRepository
+) : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val pendingResult = goAsync()
         val alarmId = intent.getIntExtra("alarmId", -1)
 
-        when (intent.action) {
-            ACTION_DISMISS -> {
-                stopRingtone()
-                val nm = context.getSystemService(NotificationManager::class.java)
-                nm.cancel(alarmId)
-            }
-            ACTION_SNOOZE -> {
-                stopRingtone()
-                val nm = context.getSystemService(NotificationManager::class.java)
-                nm.cancel(alarmId)
-                scheduleSnooze(context, intent)
-            }
-            else -> {
-                val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
-                val days = intent.getStringExtra("days") ?: ""
-                val label = intent.getStringExtra("label") ?: ""
-                val soundOn = intent.getBooleanExtra("soundOn", true)
-                val soundUri = intent.getStringExtra("soundUri")
-                Log.d("ALARM", "Alarm fired (id=$alarmId, label=$label, days=$days)")
-                Log.d("ALARM", "soundUri (id=$soundUri")
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            try {
+                val alarm = if (alarmId != -1) alarmRepository.getAlarmById(alarmId) else null
 
-                showNotification(
-                    context,
-                    alarmId = alarmId,
-                    title = label.ifBlank { "Alarm" },
-                    message = "Alarm triggered at ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())}",
-                    soundUri = soundUri,
-                    intent = intent
-                )
+                when (intent.action) {
+                    ACTION_DISMISS -> {
+                        stopRingtone()
+                        val nm = context.getSystemService(NotificationManager::class.java)
+                        nm.cancel(alarmId)
+                    }
+                    ACTION_SNOOZE -> {
+                        stopRingtone()
+                        val nm = context.getSystemService(NotificationManager::class.java)
+                        nm.cancel(alarmId)
+                        scheduleSnooze(context, intent)
+                    }
+                    else -> {
+                        val timeInMillis = intent.getLongExtra("timeInMillis", 0L)
+                        val days = intent.getStringExtra("days") ?: ""
+                        val label = intent.getStringExtra("label") ?: ""
+                        val soundOn = intent.getBooleanExtra("soundOn", true)
+                        val soundUri = intent.getStringExtra("soundUri")
+                        Log.d("ALARM", "Alarm fired (id=$alarmId, label=$label, days=$days)")
+                        Log.d("ALARM", "soundUri (id=$soundUri")
 
+                        showNotification(
+                            context,
+                            alarmId = alarmId,
+                            title = label.ifBlank { "Alarm" },
+                            message = "Alarm triggered at ${SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())}",
+                            soundUri = soundUri,
+                            intent = intent
+                        )
 
-                Log.d("ALARM", "${alarm.getRepeatDays()}")
+                        if (alarm != null) {
+                            Log.d("ALARM", "${alarm.getRepeatDays()}")
 
-                if (days.isNotEmpty()) {
-                    scheduleNextAlarm(context, alarmId)
-                } else {
-                    Log.d("ALARM", "One-time alarm. Not rescheduling.")
+                            if (alarm.days.isNotEmpty()) {
+                                scheduleNextAlarm(context, alarmId, alarm)
+                            } else {
+                                Log.d("ALARM", "One-time alarm. Not rescheduling.")
+                            }
+                        }
+                    }
                 }
+            } finally {
+                pendingResult.finish()
             }
         }
     }
@@ -97,7 +115,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
 
     @SuppressLint("ScheduleExactAlarm")
-    private fun scheduleNextAlarm(context: Context, alarmId: Int) {
+    private fun scheduleNextAlarm(context: Context, alarmId: Int, alarm: Alarm) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
         val repeatDays = alarm.getRepeatDays()
         val now = Calendar.getInstance()
@@ -159,7 +177,7 @@ class AlarmReceiver : BroadcastReceiver() {
             ringtone?.stop()
         }
 
-        fun showNotification(context: Context, alarmId: Int, title: String, message: String, soundUri: String? = null, intent: Intent) {
+        private fun showNotification(context: Context, alarmId: Int, title: String, message: String, soundUri: String? = null, intent: Intent) {
             val nm = context.getSystemService(NotificationManager::class.java)
 
             val channel = NotificationChannel(

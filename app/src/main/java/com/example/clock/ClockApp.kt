@@ -9,6 +9,12 @@ import com.example.clock.worldClock.data.WorldClockRepository
 import com.example.clock.worldClock.WorldClockViewModel
 
 class ClockApp : Application() {
+    
+    companion object {
+        lateinit var instance: ClockApp
+            private set
+    }
+
     lateinit var worldClockViewModel: WorldClockViewModel
     lateinit var timerViewModel: TimerViewModel
 
@@ -23,5 +29,10 @@ class ClockApp : Application() {
     }
     val timerRepository: TimerRepository by lazy {
         TimerRepository(ClockDataBase.getDatabase(this).timerDao())
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        instance = this
     }
 }

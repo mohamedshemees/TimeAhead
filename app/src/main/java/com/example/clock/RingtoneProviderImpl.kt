@@ -1,23 +1,22 @@
 package com.example.clock
 
-import android.content.Context
 import android.media.RingtoneManager
 import com.example.clock.alarm.Ringtone
 
-class RingtoneProviderImpl(private val context: Context) : RingtoneProvider {
+class RingtoneProviderImpl(private val context: ClockApp) : RingtoneProvider {
 
-    override suspend fun getSystemRingtones() : List<Ringtone> {
-        val ringtoneProvider = RingtoneManager(context)
+    override suspend fun getSystemRingtones(): List<Ringtone> {
+        val ringtoneManager = RingtoneManager(context)
         val ringtones = mutableListOf<Ringtone>()
-        ringtoneProvider.setType(RingtoneManager.TYPE_ALARM)
-        val cursor = ringtoneProvider.cursor
+        ringtoneManager.setType(RingtoneManager.TYPE_ALARM)
+        
+        val cursor = ringtoneManager.cursor
         while (cursor.moveToNext()) {
-            val ringtoneUri = ringtoneProvider.getRingtoneUri(cursor.position)
-            val ringtoneTitle = ringtoneProvider.getRingtone(cursor.position).getTitle(context)
-            val ringtone = Ringtone(ringtoneTitle, ringtoneUri)
-            ringtones.add(ringtone)
+            val title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX)
+            val uri = ringtoneManager.getRingtoneUri(cursor.position)
+            ringtones.add(Ringtone(title, uri))
         }
+        
         return ringtones
-
     }
 }
