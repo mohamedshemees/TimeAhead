@@ -1,7 +1,7 @@
 package com.example.clock
 
 import android.media.RingtoneManager
-import com.example.clock.alarm.Ringtone
+import com.example.clock.alarm.ui.Ringtone
 
 class RingtoneProviderImpl(private val context: ClockApp) : RingtoneProvider {
 

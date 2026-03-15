@@ -3,8 +3,7 @@ package com.example.clock.timer.data
 import android.content.Context
 import android.media.RingtoneManager
 import androidx.lifecycle.LiveData
-import com.example.clock.alarm.Ringtone
-import com.example.clock.alarm.domain.Alarm
+import com.example.clock.alarm.ui.Ringtone
 
 import com.example.clock.timer.domain.TimerPreset
 import java.util.Calendar

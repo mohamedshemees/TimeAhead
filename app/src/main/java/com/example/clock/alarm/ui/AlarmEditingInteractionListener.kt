@@ -1,7 +1,5 @@
 package com.example.clock.alarm.ui
 
-import com.example.clock.alarm.Ringtone
-
 interface AlarmEditingInteractionListener {
     fun initAlarm(alarmId: Int)
     fun updateTime(hour: Int, minute: Int)

@@ -13,8 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.clock.ClockApp
 import com.example.clock.R
-import com.example.clock.alarm.AlarmViewModel
-import com.example.clock.alarm.AlarmViewModelFactory
 import com.example.clock.alarm.ui.adapters.AlarmAdapter
 import com.example.clock.databinding.FragmentAlarmBinding
 

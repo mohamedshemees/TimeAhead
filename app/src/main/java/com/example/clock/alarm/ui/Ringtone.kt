@@ -1,4 +1,4 @@
-package com.example.clock.alarm
+package com.example.clock.alarm.ui
 
 import android.net.Uri
 import android.os.Parcelable

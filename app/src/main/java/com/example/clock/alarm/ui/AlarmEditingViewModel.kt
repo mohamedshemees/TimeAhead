@@ -14,7 +14,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.clock.alarm.Ringtone
 import com.example.clock.alarm.data.AlarmRepository
 import com.example.clock.alarm.domain.Alarm
 import com.example.clock.alarm.ui.broadcastreceiver.AlarmReceiver

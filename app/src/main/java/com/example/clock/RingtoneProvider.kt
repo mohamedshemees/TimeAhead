@@ -1,7 +1,6 @@
 package com.example.clock
 
-import android.content.Context
-import com.example.clock.alarm.Ringtone
+import com.example.clock.alarm.ui.Ringtone
 
 interface RingtoneProvider {
     suspend fun getSystemRingtones() : List<Ringtone>

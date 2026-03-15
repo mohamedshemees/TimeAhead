@@ -1,4 +1,4 @@
-package com.example.clock.alarm
+package com.example.clock.alarm.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
