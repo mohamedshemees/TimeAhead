@@ -14,7 +14,9 @@ class AlarmCreationActivity : AppCompatActivity() {
         val app = application as ClockApp
         AlarmEditingViewModelFactory(
             application,
-            app.alarmRepository)
+            app.alarmRepository,
+            app.ringtoneProvider
+            )
     }
 
     private lateinit var interactionListener: AlarmEditingInteractionListener
@@ -26,7 +28,6 @@ class AlarmCreationActivity : AppCompatActivity() {
         interactionListener = viewModel
 
         if (savedInstanceState == null) {
-            //interactionListener.initAlarm(alarm)
             supportFragmentManager.beginTransaction()
                 .replace(R.id.alarm_creation_container, AlarmEditingFragment())
                 .commit()

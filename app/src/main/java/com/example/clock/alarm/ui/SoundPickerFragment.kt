@@ -14,7 +14,7 @@ import com.example.clock.databinding.FragmentSoundPickerBinding
 import com.example.clock.alarm.ui.adapters.RingtoneAdapter
 
 class SoundPickerFragment : Fragment() {
-    private val alarmViewModel: AlarmViewModel by activityViewModels()
+    private val alarmViewModel: AlarmEditingViewModel by activityViewModels()
 
     private var _binding: FragmentSoundPickerBinding? = null
     private val binding get() = _binding!!
@@ -30,20 +30,20 @@ class SoundPickerFragment : Fragment() {
 
         binding.ringtonesRv.layoutManager = LinearLayoutManager(requireContext())
 
-        // Set up adapter
-        var pickedRingtone: Ringtone = alarmViewModel.ringtones[0]
-        val adapter = RingtoneAdapter(alarmViewModel.ringtones) { ringtone ->
-            playRingtone(requireContext(), ringtone.uri)
-            selectedRingtoneUri = ringtone.uri
-            pickedRingtone = ringtone
+        // Observe UI state for ringtones
+        alarmViewModel.uiState.observe(viewLifecycleOwner) { state ->
+            val ringtones = state.ringtones
+            if (ringtones.isNotEmpty()) {
+                val adapter = RingtoneAdapter(ringtones) { ringtone ->
+                    playRingtone(requireContext(), ringtone.uri)
+                    selectedRingtoneUri = ringtone.uri
+                    alarmViewModel.updateRingtone(ringtone)
+                }
+                binding.ringtonesRv.adapter = adapter
+            }
         }
-        binding.ringtonesRv.adapter = adapter
 
         binding.BackBtn.setOnClickListener {
-            val result = Bundle().apply {
-                putParcelable("selected_ringtone", pickedRingtone)
-            }
-            parentFragmentManager.setFragmentResult("ringtone_request", result)
             parentFragmentManager.popBackStack()
         }
 
@@ -70,5 +70,4 @@ class SoundPickerFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

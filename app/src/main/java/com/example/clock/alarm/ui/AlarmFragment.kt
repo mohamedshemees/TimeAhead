@@ -29,7 +29,6 @@ class AlarmFragment : Fragment() {
             val app = requireActivity().application as ClockApp
             AlarmViewModelFactory(
                 app.alarmRepository,
-                app.ringtoneProvider,
                 app
             )
         }

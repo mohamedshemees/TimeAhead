@@ -19,6 +19,7 @@ import com.example.clock.alarm.domain.Alarm
 import com.example.clock.alarm.ui.broadcastreceiver.AlarmReceiver
 import com.example.clock.alarm.ui.mappers.toDomain
 import com.example.clock.alarm.ui.mappers.toUiState
+import com.example.clock.RingtoneProvider
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -27,12 +28,14 @@ import java.util.Locale
 data class AlarmEditingUiState(
     val alarm: AlarmUiState = AlarmUiState(),
     val selectedDaysText: String = "",
+    val ringtones: List<Ringtone> = emptyList(),
     val finishActivity: Boolean = false
 )
 
 class AlarmEditingViewModel(
     application: Application,
-    private val repository: AlarmRepository
+    private val repository: AlarmRepository,
+    private val ringtoneProvider: RingtoneProvider
 ) : AndroidViewModel(application), AlarmEditingInteractionListener {
 
     private val _uiState = MutableLiveData<AlarmEditingUiState>()
@@ -45,6 +48,14 @@ class AlarmEditingViewModel(
 
     init {
         _uiState.value = AlarmEditingUiState()
+        loadRingtones()
+    }
+
+    private fun loadRingtones() {
+        viewModelScope.launch {
+            val ringtones = ringtoneProvider.getSystemRingtones()
+            _uiState.value = _uiState.value?.copy(ringtones = ringtones)
+        }
     }
 
     override fun initAlarm(alarmId: Int) {
