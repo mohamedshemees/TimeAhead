@@ -58,17 +58,11 @@ class AlarmReceiver : BroadcastReceiver() {
                     intent = intent
                 )
 
-                val alarm = Alarm(
-                    alarmId = alarmId,
-                    timeInMillis = timeInMillis,
-                    days = days,
-                    label = label,
-                    sound = Alarm.AlarmSound(soundOn = soundOn, soundUri = soundUri ?: "")
-                )
+
                 Log.d("ALARM", "${alarm.getRepeatDays()}")
 
-                if (alarm.getRepeatDays().isNotEmpty()) {
-                    scheduleNextAlarm(context, alarmId, alarm)
+                if (days.isNotEmpty()) {
+                    scheduleNextAlarm(context, alarmId)
                 } else {
                     Log.d("ALARM", "One-time alarm. Not rescheduling.")
                 }
@@ -103,7 +97,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
 
     @SuppressLint("ScheduleExactAlarm")
-    private fun scheduleNextAlarm(context: Context, alarmId: Int, alarm: Alarm) {
+    private fun scheduleNextAlarm(context: Context, alarmId: Int) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
         val repeatDays = alarm.getRepeatDays()
         val now = Calendar.getInstance()

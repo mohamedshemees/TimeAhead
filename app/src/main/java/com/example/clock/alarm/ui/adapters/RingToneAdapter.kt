@@ -7,11 +7,12 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clock.R
+import com.example.clock.alarm.Ringtone
 import com.example.clock.alarm.ui.SoundPickerFragment
 
 class RingtoneAdapter(
-    private val ringtones: List<SoundPickerFragment.Ringtone>,
-    private val onRingtoneSelected: (SoundPickerFragment.Ringtone) -> Unit,
+    private val ringtones: List<Ringtone>,
+    private val onRingtoneSelected: (Ringtone) -> Unit,
 
     ) : RecyclerView.Adapter<RingtoneAdapter.RingtoneViewHolder>() {
     private var selectedPosition = -1
@@ -32,7 +33,7 @@ class RingtoneAdapter(
         private val titleTextView: TextView = itemView.findViewById(R.id.ringtone_title_tv)
         private val radioButton: RadioButton = itemView.findViewById(R.id.radio_btn)
 
-        fun bind(ringtone: SoundPickerFragment.Ringtone = ringtones[0], position: Int) {
+        fun bind(ringtone: Ringtone = ringtones[0], position: Int) {
             titleTextView.text = ringtone.title
             radioButton.isChecked = (position == selectedPosition)
             if (position == 0 && selectedPosition == -1) {

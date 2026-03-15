@@ -14,16 +14,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.clock.alarm.Ringtone
 import com.example.clock.alarm.data.AlarmRepository
 import com.example.clock.alarm.domain.Alarm
 import com.example.clock.alarm.ui.broadcastreceiver.AlarmReceiver
+import com.example.clock.alarm.ui.mappers.toDomain
+import com.example.clock.alarm.ui.mappers.toUiState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 data class AlarmEditingUiState(
-    val alarm: Alarm = Alarm(),
+    val alarm: AlarmUiState = AlarmUiState(),
     val selectedDaysText: String = "",
     val finishActivity: Boolean = false
 )
@@ -36,8 +39,7 @@ class AlarmEditingViewModel(
     private val _uiState = MutableLiveData<AlarmEditingUiState>()
     val uiState: LiveData<AlarmEditingUiState> = _uiState
 
-    private lateinit var originalAlarm: Alarm
-    private val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    private val daysList = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     private val selectedDays = mutableSetOf<Int>()
     private var timeInMillis: Long = 0L
     private var isToday: Boolean = false
@@ -46,20 +48,57 @@ class AlarmEditingViewModel(
         _uiState.value = AlarmEditingUiState()
     }
 
-    override fun initAlarm(alarm: Alarm) {
-        originalAlarm = alarm
-        _uiState.value = _uiState.value?.copy(alarm = alarm)
-        timeInMillis = alarm.timeInMillis
-        selectedDays.addAll(alarm.getRepeatDays())
-        updateSelectedDaysText()
+    override fun initAlarm(alarmId: Int) {
+        viewModelScope.launch {
+            val alarm = if (alarmId != -1) {
+                repository.getAlarmById(alarmId)
+            } else {
+                createDefaultAlarm()
+            }
+
+            alarm?.let {
+                _uiState.value = _uiState.value?.copy(alarm = it.toUiState())
+                timeInMillis = it.timeInMillis
+                selectedDays.clear()
+                selectedDays.addAll(it.getRepeatDays())
+                updateSelectedDaysText()
+            }
+        }
+    }
+
+    private fun createDefaultAlarm(): Alarm {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 6)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+            if (before(Calendar.getInstance())) {
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+        }
+        return Alarm(
+            alarmId = -1,
+            timeInMillis = calendar.timeInMillis,
+            label = "",
+            days = "",
+            amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "am" else "pm",
+            sound = Alarm.AlarmSound(true, "Default", ""),
+            vibrate = Alarm.AlarmVibration(true, "Standard"),
+            snooze = Alarm.AlarmSnooze(true, "5 minutes"),
+            isEnabled = true
+        )
     }
 
     override fun updateTime(hour: Int, minute: Int) {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, hour)
-        calendar.set(Calendar.MINUTE, minute)
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        
         timeInMillis = calendar.timeInMillis
-        isToday = calendar.after(Calendar.getInstance())
+        isToday = !calendar.before(Calendar.getInstance())
         updateSelectedDaysText()
     }
 
@@ -73,55 +112,58 @@ class AlarmEditingViewModel(
     }
 
     override fun updateLabel(label: String) {
-        val currentAlarm = _uiState.value?.alarm ?: return
-        _uiState.value = _uiState.value?.copy(alarm = currentAlarm.copy(label = label))
+        _uiState.value = _uiState.value?.let { state ->
+            state.copy(alarm = state.alarm.copy(label = label))
+        }
     }
 
-    override fun updateRingtone(ringtone: SoundPickerFragment.Ringtone) {
-        val currentAlarm = _uiState.value?.alarm ?: return
-        val newSound =
-            currentAlarm.sound.copy(soundName = ringtone.title, soundUri = ringtone.uri.toString())
-        _uiState.value = _uiState.value?.copy(alarm = currentAlarm.copy(sound = newSound))
+    override fun updateRingtone(ringtone: Ringtone) {
+        _uiState.value = _uiState.value?.let { state ->
+            val newSound = state.alarm.sound.copy(soundName = ringtone.title, soundUri = ringtone.uri.toString())
+            state.copy(alarm = state.alarm.copy(sound = newSound))
+        }
     }
 
     override fun updateSoundOn(checked: Boolean) {
-        val currentAlarm = _uiState.value?.alarm ?: return
-        val newSound = currentAlarm.sound.copy(soundOn = checked)
-        _uiState.value = _uiState.value?.copy(alarm = currentAlarm.copy(sound = newSound))
+        _uiState.value = _uiState.value?.let { state ->
+            val newSound = state.alarm.sound.copy(soundOn = checked)
+            state.copy(alarm = state.alarm.copy(sound = newSound))
+        }
     }
 
     override fun updateVibrateOn(checked: Boolean) {
-        val currentAlarm = _uiState.value?.alarm ?: return
-        val newVibration = currentAlarm.vibrate.copy(vibrationOn = checked)
-        _uiState.value = _uiState.value?.copy(alarm = currentAlarm.copy(vibrate = newVibration))
+        _uiState.value = _uiState.value?.let { state ->
+            val newVibration = state.alarm.vibrate.copy(vibrationOn = checked)
+            state.copy(alarm = state.alarm.copy(vibrate = newVibration))
+        }
     }
 
     override fun updateSnoozeOn(checked: Boolean) {
-        val currentAlarm = _uiState.value?.alarm ?: return
-        val newSnooze = currentAlarm.snooze.copy(snoozeOn = checked)
-        _uiState.value = _uiState.value?.copy(alarm = currentAlarm.copy(snooze = newSnooze))
+        _uiState.value = _uiState.value?.let { state ->
+            val newSnooze = state.alarm.snooze.copy(snoozeOn = checked)
+            state.copy(alarm = state.alarm.copy(snooze = newSnooze))
+        }
     }
 
     override fun saveAlarm() {
         Log.d("ALARM", "Saving alarm")
         viewModelScope.launch {
-            val currentAlarm = _uiState.value?.alarm ?: return@launch
-            val updatedAlarm = currentAlarm.copy(
+            val state = _uiState.value ?: return@launch
+            val updatedAlarm = state.alarm.copy(
                 timeInMillis = timeInMillis,
-                days = _uiState.value?.selectedDaysText ?: "",
-                Enabled = true
-            )
-            if (originalAlarm.alarmId == 0) {
+                days = state.selectedDaysText,
+                isEnabled = true
+            ).toDomain()
 
+            if (updatedAlarm.alarmId != -1) {
                 repository.update(updatedAlarm)
-                cancelAlarm(getApplication(), originalAlarm)
             } else {
                 repository.insert(updatedAlarm)
             }
 
             setAlarm(getApplication(), updatedAlarm)
 
-            _uiState.postValue(_uiState.value?.copy(finishActivity = true))
+            _uiState.postValue(state.copy(finishActivity = true))
         }
     }
 
@@ -130,21 +172,26 @@ class AlarmEditingViewModel(
     }
 
     private fun updateSelectedDaysText() {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = this@AlarmEditingViewModel.timeInMillis
+        }
         val shortDayName = SimpleDateFormat("EEE", Locale.getDefault()).format(calendar.time)
         val dateNumber = calendar.get(Calendar.DAY_OF_MONTH)
 
         val text = when {
-            selectedDays.isEmpty() -> if (isToday) "Today-$shortDayName,$dateNumber" else {
-                calendar.add(Calendar.DAY_OF_MONTH, 1)
-                val tomorrowName =
-                    SimpleDateFormat("EEE", Locale.getDefault()).format(calendar.time)
-                val tomorrowNumber = calendar.get(Calendar.DAY_OF_MONTH)
-                "Tomorrow-$tomorrowName,$tomorrowNumber"
+            selectedDays.isEmpty() -> {
+                val now = Calendar.getInstance()
+                if (calendar.after(now)) {
+                    "Today-$shortDayName,$dateNumber"
+                } else {
+                    val tomorrow = (now.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
+                    val tomorrowName = SimpleDateFormat("EEE", Locale.getDefault()).format(tomorrow.time)
+                    val tomorrowNumber = tomorrow.get(Calendar.DAY_OF_MONTH)
+                    "Tomorrow-$tomorrowName,$tomorrowNumber"
+                }
             }
-
             selectedDays.size == 7 -> "Every day"
-            else -> "every ${selectedDays.sorted().joinToString(", ") { days[it] }}"
+            else -> "every ${selectedDays.sorted().joinToString(", ") { daysList[it] }}"
         }
         _uiState.value = _uiState.value?.copy(selectedDaysText = text)
     }
@@ -156,6 +203,7 @@ class AlarmEditingViewModel(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                 data = Uri.parse("package:${context.packageName}")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             context.startActivity(intent)
             return
@@ -172,7 +220,7 @@ class AlarmEditingViewModel(
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            alarm.alarmId,
+            if (alarm.alarmId == -1) System.currentTimeMillis().toInt() else alarm.alarmId,
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -182,17 +230,5 @@ class AlarmEditingViewModel(
             alarm.timeInMillis,
             pendingIntent
         )
-    }
-
-    private fun cancelAlarm(context: Context, alarm: Alarm) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarm.alarmId,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.cancel(pendingIntent)
     }
 }

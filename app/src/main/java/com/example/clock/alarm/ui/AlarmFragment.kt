@@ -30,7 +30,9 @@ class AlarmFragment : Fragment() {
         val alarmViewModel: AlarmViewModel by viewModels {
             val app = requireActivity().application as ClockApp
             AlarmViewModelFactory(
-                app.alarmRepository, app
+                app.alarmRepository,
+                app.ringtoneProvider,
+                app
             )
         }
         alarmViewModel.getAllAlarms()
@@ -52,7 +54,7 @@ class AlarmFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        alarmViewModel.allAlarms.observe(viewLifecycleOwner) { alarms ->
+        alarmViewModel.alarms.observe(viewLifecycleOwner) { alarms ->
             adapter.updateAlarms(alarms)
             alarmscount = alarms.size
         }

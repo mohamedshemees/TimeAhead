@@ -13,6 +13,7 @@ import com.example.clock.alarm.domain.Alarm
 import kotlinx.coroutines.launch
 import android.annotation.SuppressLint
 import android.util.Log
+import com.example.clock.alarm.data.mappers.toDomain
 import com.example.clock.alarm.ui.utils.AlarmUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +35,8 @@ class BootReceiver : BroadcastReceiver() {
                 val alarmList = alarmDao.getAllAlarmsSynchronous()
                 Log.d("BootReceiver", "Found ${alarmList.size} alarms to reschedule")
 
-                alarmList.filter { it.Enabled }.forEach { alarm ->
-                    rescheduleAlarm(context, alarm)
+                alarmList.filter { it.isEnabled }.forEach { alarm ->
+                    rescheduleAlarm(context, alarm.toDomain())
                 }
             } catch (e: Exception) {
                 Log.e("BootReceiver", "Failed to reschedule alarms: ${e.message}")

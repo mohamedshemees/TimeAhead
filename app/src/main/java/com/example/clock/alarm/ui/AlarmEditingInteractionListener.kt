@@ -1,13 +1,13 @@
 package com.example.clock.alarm.ui
 
-import com.example.clock.alarm.domain.Alarm
+import com.example.clock.alarm.Ringtone
 
 interface AlarmEditingInteractionListener {
-    fun initAlarm(alarm: Alarm)
+    fun initAlarm(alarmId: Int)
     fun updateTime(hour: Int, minute: Int)
     fun toggleDay(dayIndex: Int)
     fun updateLabel(label: String)
-    fun updateRingtone(ringtone: SoundPickerFragment.Ringtone)
+    fun updateRingtone(ringtone: Ringtone)
     fun updateSoundOn(checked: Boolean)
     fun updateVibrateOn(checked: Boolean)
     fun updateSnoozeOn(checked: Boolean)

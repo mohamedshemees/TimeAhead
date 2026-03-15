@@ -11,6 +11,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.clock.R
+import com.example.clock.alarm.Ringtone
 import com.example.clock.databinding.FragmentAlarmEditingBinding
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -89,7 +90,7 @@ class AlarmEditingFragment : Fragment() {
         }
 
         parentFragmentManager.setFragmentResultListener("ringtone_request", viewLifecycleOwner) { _, bundle ->
-            bundle.getParcelable<SoundPickerFragment.Ringtone>("selected_ringtone")?.let {
+            bundle.getParcelable<Ringtone>("selected_ringtone")?.let {
                 interactionListener.updateRingtone(it)
             }
         }

@@ -1,55 +1,44 @@
 package com.example.clock.alarm.data
 
-import android.content.Context
-import android.media.RingtoneManager
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
+import com.example.clock.alarm.data.dao.AlarmDao
+import com.example.clock.alarm.data.mappers.toDomain
+import com.example.clock.alarm.data.mappers.toEntity
 import com.example.clock.alarm.domain.Alarm
-import com.example.clock.alarm.ui.SoundPickerFragment.Ringtone
 import java.util.Calendar
 import java.util.TimeZone
 
 class AlarmRepository(
     private val alarmDao: AlarmDao,
 ) {
-    var allRingtones: List<Ringtone> = emptyList()
 
     suspend fun insert(alarm: Alarm) {
-        alarmDao.insertAlarm(alarm)
+        alarmDao.insertAlarm(alarm.toEntity())
     }
 
     suspend fun update(alarm: Alarm) {
-        alarmDao.updateAlarm(alarm)
+        alarmDao.updateAlarm(alarm.toEntity())
     }
 
     suspend fun delete(alarm: Alarm) {
-        alarmDao.deleteAlarm(alarm)
+        alarmDao.deleteAlarm(alarm.toEntity())
     }
 
     suspend fun deleteAlarms(alarms: List<Alarm>) {
-        alarmDao.deleteAlarms(alarms)
+        alarmDao.deleteAlarms(alarms.map { it.toEntity() })
     }
 
     fun getAllAlarms(): LiveData<List<Alarm>> {
-        return alarmDao.getAllAlarms()
+        return alarmDao.getAllAlarms().map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
-        suspend fun getSystemRingtones(context: Context) {
-            val ringtoneManager = RingtoneManager(context)
-            val ringtones = mutableListOf<Ringtone>()
-            ringtoneManager.setType(RingtoneManager.TYPE_ALARM)
-            val cursor = ringtoneManager.cursor
-            while (cursor.moveToNext()) {
-                val ringtoneUri = ringtoneManager.getRingtoneUri(cursor.position)
-                val ringtoneTitle = ringtoneManager.getRingtone(cursor.position).getTitle(context)
-                val ringtone = Ringtone(ringtoneTitle, ringtoneUri)
-                ringtones.add(ringtone)
-            }
-            allRingtones = ringtones
-        }
 
-        suspend fun getAlarm(label: String, time: String, days: String): Alarm? {
-            return alarmDao.getAlarm(label, time, days)
-        }
+    suspend fun getAlarmById(id: Int): Alarm? {
+        return alarmDao.getAlarmById(id)?.toDomain()
+    }
 
     fun getDefaultTimeMillis(): Long {
         val calendar = Calendar.getInstance().apply {
@@ -62,4 +51,3 @@ class AlarmRepository(
         return calendar.timeInMillis
     }
 }
-

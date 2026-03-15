@@ -42,16 +42,16 @@ class AlarmAdapter(
         val alarm = alarmList[position]
 
         holder.switch.setOnCheckedChangeListener(null)
-        holder.switch.isChecked = alarm.Enabled
-        holder.switch.setOnCheckedChangeListener { _, isChecked ->
-            alarm.Enabled = isChecked
+        holder.switch.isChecked = alarm.isEnabled
+       /* holder.switch.setOnCheckedChangeListener { _, isChecked ->
+            alarm.isEnabled = isChecked
             onAlarmToggled(alarm)
-        }
+        }*/
 
         holder.timeTextView.text = convertMillisToTimeWithCalendar(alarm.timeInMillis)
         holder.labelTextView.text = alarm.label
         holder.dateTextView.text = alarm.days
-        holder.amapm.text = alarm.am_pm
+        holder.amapm.text = alarm.amPm
 
         if (holder.labelTextView.text.isEmpty()) {
             holder.labelTextView.visibility = View.GONE
@@ -59,7 +59,7 @@ class AlarmAdapter(
             holder.labelTextView.visibility = View.VISIBLE
         }
 
-        if (alarm.Enabled) {
+        if (alarm.isEnabled) {
             holder.timeTextView.setTextColor(Color.BLACK)
             holder.dateTextView.setTextColor(Color.BLACK)
             holder.amapm.setTextColor(Color.BLACK)
@@ -76,7 +76,7 @@ class AlarmAdapter(
                 toggleSelection(alarm)
             } else {
                 val intent = Intent(holder.itemView.context, AlarmCreationActivity::class.java)
-                intent.putExtra("alarm", alarm)
+                intent.putExtra("alarm", alarm.alarmId)
                 holder.itemView.context.startActivity(intent)
             }
         }

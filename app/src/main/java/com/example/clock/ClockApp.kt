@@ -15,16 +15,13 @@ class ClockApp : Application() {
     val alarmRepository: AlarmRepository by lazy {
         AlarmRepository(ClockDataBase.getDatabase(this).alarmDao())
     }
+    val ringtoneProvider: RingtoneProvider by lazy {
+        RingtoneProviderImpl(this)
+    }
     val clockRepository: WorldClockRepository by lazy {
         WorldClockRepository(ClockDataBase.getDatabase(this).worldClockDao())
     }
     val timerRepository: TimerRepository by lazy {
         TimerRepository(ClockDataBase.getDatabase(this).timerDao())
     }
-    override fun onCreate() {
-        super.onCreate()
-
-
-    }
-
 }

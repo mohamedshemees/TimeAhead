@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.clock.databinding.FragmentSoundPickerBinding
 import com.example.clock.alarm.AlarmViewModel
+import com.example.clock.alarm.Ringtone
 import com.example.clock.alarm.ui.adapters.RingtoneAdapter
 import kotlinx.parcelize.Parcelize
 
@@ -34,8 +34,8 @@ class SoundPickerFragment : Fragment() {
         binding.ringtonesRv.layoutManager = LinearLayoutManager(requireContext())
 
         // Set up adapter
-        var pickedRingtone: Ringtone = alarmViewModel.repository.allRingtones[0]
-        val adapter = RingtoneAdapter(alarmViewModel.repository.allRingtones) { ringtone ->
+        var pickedRingtone: Ringtone = alarmViewModel.ringtones[0]
+        val adapter = RingtoneAdapter(alarmViewModel.ringtones) { ringtone ->
             playRingtone(requireContext(), ringtone.uri)
             selectedRingtoneUri = ringtone.uri
             pickedRingtone = ringtone
@@ -66,7 +66,7 @@ class SoundPickerFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        stopRingtone() // Stop playback when the fragment is no longer visible
+        stopRingtone()
     }
 
     override fun onDestroyView() {
@@ -74,6 +74,4 @@ class SoundPickerFragment : Fragment() {
         _binding = null
     }
 
-    @Parcelize
-    data class Ringtone(val title: String, val uri: Uri) : Parcelable
 }

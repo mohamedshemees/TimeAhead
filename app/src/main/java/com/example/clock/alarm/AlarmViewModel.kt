@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.clock.ClockApp
+import com.example.clock.RingtoneProvider
 import com.example.clock.alarm.domain.Alarm
 import com.example.clock.alarm.data.AlarmRepository
 import com.example.clock.alarm.ui.broadcastreceiver.AlarmReceiver
@@ -16,17 +17,20 @@ import kotlinx.coroutines.launch
 
 class AlarmViewModel(
     var repository: AlarmRepository,
+    var ringtoneProvider: RingtoneProvider,
     application: ClockApp
-    ) : AndroidViewModel(application) {
+) : AndroidViewModel(application) {
 init {
     viewModelScope.launch {
-        repository.getSystemRingtones(application)
+        ringtoneProvider.getSystemRingtones()
     }
 }
-    lateinit var allAlarms: LiveData<List<Alarm>>
+    lateinit var alarms: LiveData<List<Alarm>>
+    lateinit var ringtones: List<Ringtone>
+
 
     fun getAllAlarms() {
-        allAlarms = repository.getAllAlarms()
+        alarms = repository.getAllAlarms()
     }
     fun update(alarm: Alarm) = viewModelScope.launch {
         repository.update(alarm)
@@ -59,6 +63,5 @@ init {
             Log.w("wow", "No existing PendingIntent found for alarm $alarmId")
         }
     }
-
 
 }

@@ -6,13 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.clock.alarm.data.AlarmConverters
-import com.example.clock.alarm.data.AlarmDao
-import com.example.clock.alarm.domain.Alarm
+import com.example.clock.alarm.data.dao.AlarmDao
+import com.example.clock.alarm.data.entities.AlarmEntity
 import com.example.clock.timer.data.TimerPresetDao
 import com.example.clock.timer.domain.TimerPreset
 import com.example.clock.worldClock.ui.TimeZoneItem
 
-@Database(entities = [Alarm::class, TimeZoneItem.TimeZone::class, TimerPreset::class], version = 1, exportSchema = false)
+@Database(entities = [AlarmEntity::class, TimeZoneItem.TimeZone::class, TimerPreset::class], version = 1, exportSchema = false)
 @TypeConverters(AlarmConverters::class)
 abstract class ClockDataBase : RoomDatabase() {
     abstract fun alarmDao(): AlarmDao
