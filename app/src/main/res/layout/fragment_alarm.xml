@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@color/surface"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -15,7 +16,7 @@
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/guideline3"
-        android:backgroundTint="@color/light_gray"
+        android:backgroundTint="@color/surface"
         >
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -25,7 +26,7 @@
         android:fitsSystemWindows="true"
         app:expandedTitleMarginEnd="16dp"
         app:expandedTitleMarginStart="16dp"
-        android:backgroundTint="@color/light_gray"
+        android:backgroundTint="@color/surface"
 
         app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">
 
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:layout_gravity="center"
+            android:textColor="@color/on_surface"
             android:text="All alarms are off" />
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -69,6 +71,7 @@
             android:layout_margin="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_options_menu"
+            app:tint="@color/on_surface"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -79,6 +82,7 @@
             android:layout_gravity="end"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_add"
+            app:tint="@color/on_surface"
             app:layout_constraintBottom_toBottomOf="@+id/menuButton"
             app:layout_constraintEnd_toStartOf="@+id/menuButton" />
 
@@ -90,6 +94,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_delete"
             android:layout_marginStart="10dp"
+            app:tint="@color/on_surface"
 
             app:layout_constraintBottom_toBottomOf="@+id/add_alarm_btn"
             app:layout_constraintStart_toStartOf="parent" />

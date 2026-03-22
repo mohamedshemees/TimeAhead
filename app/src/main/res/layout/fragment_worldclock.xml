@@ -1,7 +1,8 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/surface">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -10,7 +11,7 @@
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/guideline3"
-        android:backgroundTint="@color/light_gray"
+        android:backgroundTint="@color/surface"
 
         >
 
@@ -22,7 +23,7 @@
             android:fitsSystemWindows="true"
             app:expandedTitleMarginEnd="16dp"
             app:expandedTitleMarginStart="16dp"
-            android:backgroundTint="@color/light_gray"
+            android:backgroundTint="@color/surface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways|snap">
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,6 +39,7 @@
                 android:textSize="24sp"
                 android:text="Default time zone"
                 android:layout_gravity="center"
+                android:textColor="@color/on_surface"
                 />
             <TextView
                 android:id="@+id/timezone"
@@ -46,15 +48,40 @@
                 android:textSize="18sp"
                 android:text="Default time zone"
                 android:layout_gravity="center"
-                android:textColor="#7E7E7E"
+                android:textColor="@color/hint_text"
                 />
         </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ImageButton
+        android:id="@+id/add_Timezone_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_add"
+        app:tint="@color/on_surface"
+        app:layout_constraintBottom_toBottomOf="@id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+        <ImageButton
+            android:id="@+id/delete_timezone_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_delete"
+            android:layout_marginStart="10dp"
+            app:tint="@color/on_surface"
+            app:layout_constraintBottom_toBottomOf="@id/add_Timezone_btn"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/timzones_rv"
