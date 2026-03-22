@@ -29,7 +29,7 @@ fun AlarmEntity.toDomain(): Alarm {
 
 fun Alarm.toEntity(): AlarmEntity {
     return AlarmEntity(
-        alarmId = alarmId,
+        alarmId = if (alarmId == -1) 0 else alarmId,
         timeInMillis = timeInMillis,
         label = label,
         days = days,

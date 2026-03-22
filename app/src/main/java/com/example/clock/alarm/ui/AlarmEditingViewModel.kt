@@ -6,6 +6,7 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -86,13 +87,14 @@ class AlarmEditingViewModel(
                 add(Calendar.DAY_OF_MONTH, 1)
             }
         }
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString()
         return Alarm(
             alarmId = -1,
             timeInMillis = calendar.timeInMillis,
             label = "",
             days = "",
             amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "am" else "pm",
-            sound = Alarm.AlarmSound(true, "Default", ""),
+            sound = Alarm.AlarmSound(true, "Default", defaultSoundUri),
             vibrate = Alarm.AlarmVibration(true, "Standard"),
             snooze = Alarm.AlarmSnooze(true, "5 minutes"),
             isEnabled = true
@@ -159,19 +161,21 @@ class AlarmEditingViewModel(
         Log.d("ALARM", "Saving alarm")
         viewModelScope.launch {
             val state = _uiState.value ?: return@launch
-            val updatedAlarm = state.alarm.copy(
+            val updatedAlarmUi = state.alarm.copy(
                 timeInMillis = timeInMillis,
                 days = state.selectedDaysText,
                 isEnabled = true
-            ).toDomain()
+            )
+            val domainAlarm = updatedAlarmUi.toDomain()
 
-            if (updatedAlarm.alarmId != -1) {
-                repository.update(updatedAlarm)
+            if (domainAlarm.alarmId != -1) {
+                repository.update(domainAlarm)
+                setAlarm(getApplication(), domainAlarm)
             } else {
-                repository.insert(updatedAlarm)
+                val newId = repository.insert(domainAlarm)
+                val alarmWithId = domainAlarm.copy(alarmId = newId.toInt())
+                setAlarm(getApplication(), alarmWithId)
             }
-
-            setAlarm(getApplication(), updatedAlarm)
 
             _uiState.postValue(state.copy(finishActivity = true))
         }
@@ -230,7 +234,7 @@ class AlarmEditingViewModel(
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            if (alarm.alarmId == -1) System.currentTimeMillis().toInt() else alarm.alarmId,
+            alarm.alarmId,
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

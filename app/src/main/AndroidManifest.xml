@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".ClockApp"
@@ -16,7 +18,8 @@
         android:roundIcon="@mipmap/ic_clockahead_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Clock"
-        tools:targetApi="31">
+        tools:targetApi="35">
+
         <activity
             android:name=".worldClock.ui.TimezonePickerActivity"
             android:exported="false" />
@@ -29,18 +32,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".alarm.ui.AlarmCreationActivity"></activity>
+        <activity android:name=".alarm.ui.AlarmCreationActivity" />
+
+        <service
+            android:name=".alarm.ui.broadcastreceiver.AlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <receiver
             android:name=".alarm.ui.broadcastreceiver.AlarmReceiver"
             android:enabled="true"
             android:exported="true" />
 
-<!--        <receiver android:name=".alarm.ui.BootReceiver" android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
+        <receiver
+            android:name=".alarm.ui.broadcastreceiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -13,8 +13,8 @@ class AlarmRepository(
     private val alarmDao: AlarmDao,
 ) {
 
-    suspend fun insert(alarm: Alarm) {
-        alarmDao.insertAlarm(alarm.toEntity())
+    suspend fun insert(alarm: Alarm): Long {
+        return alarmDao.insertAlarm(alarm.toEntity())
     }
 
     suspend fun update(alarm: Alarm) {
@@ -34,7 +34,6 @@ class AlarmRepository(
             entities.map { it.toDomain() }
         }
     }
-
 
     suspend fun getAlarmById(id: Int): Alarm? {
         return alarmDao.getAlarmById(id)?.toDomain()
